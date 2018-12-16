@@ -1,6 +1,4 @@
 // основная конфигурация от 29/11/2018 v2.0
-
-
 let gulp			= require ('gulp'),
 	sass			= require('gulp-sass'),
 	sourcemaps		= require('gulp-sourcemaps'),
@@ -34,7 +32,7 @@ let gulp			= require ('gulp'),
 		src: { //Пути откуда брать исходники
 			html:	'src/*.html', //Синтаксис src/*.html говорит gulp что мы хотим взять все файлы с расширением .html
 			js:		'src/script/**/*.js',//В стилях и скриптах нам понадобятся только main файлы
-			scss:	'src/scss/**/*.scss',
+			scss:	'src/scss/style.scss',
 			css:	'src/css/**/*.css',
 			img:	'src/img/**/*.*', //Синтаксис img/**/*.* означает - взять все файлы всех расширений из папки и из вложенных каталогов
 			fonts:	'src/fonts/**/*.*'
@@ -42,8 +40,8 @@ let gulp			= require ('gulp'),
 		watch: { //Тут мы укажем, за изменением каких файлов мы хотим наблюдать
 			html:	'src/**/*.html',
 			js:		'src/js/**/*.js',
-			scss:	'src/style/**/*.scss',
-			css:	'src/style/**/*.scss',
+			scss:	'src/scss/**/*.scss',
+			css:	'src/css/**/*.css',
 			img:	'src/img/**/*.*',
 			fonts:	'src/fonts/**/*.*'
 		},
@@ -56,10 +54,11 @@ gulp.task('my', () => {
 
 // watch
 gulp.task('default',['build','server'], () => {
-	gulp.watch(path.src.html, ['htmlmin']);
-	gulp.watch(path.src.scss, ['sass']);
-	gulp.watch(path.src.js, ['script']);
-	gulp.watch(path.src.img, ['img']);
+	gulp.watch(path.watch.html, ['htmlmin']);
+	// gulp.watch('src/blocks/*.html', ['htmlmin']);
+	gulp.watch(path.watch.scss, ['sass']);
+	gulp.watch(path.watch.js, ['script']);
+	gulp.watch(path.watch.img, ['img']);
 });
 
 //Сборка проекта
@@ -72,7 +71,7 @@ gulp.task('build',['clean','htmlmin','sass','script','img'], () => {
 gulp.task('htmlmin', () => {
 	gulp.src(path.src.html)
 		.pipe(plumber())
-		.pipe(gulpImport('blocks/'))
+		.pipe(gulpImport('src/blocks/'))
 		.pipe(htmlMin({
 			// collapseWhitespace: true,
 			removeComments: true
