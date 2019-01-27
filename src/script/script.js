@@ -1,2 +1,5 @@
 console.log("Hello World");
 
+{
+
+}

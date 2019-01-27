@@ -1,4 +1,3 @@
-// основная конфигурация от 29/11/2018 v2.0
 let gulp			= require ('gulp'),
 	sass			= require('gulp-sass'),
 	sourcemaps		= require('gulp-sourcemaps'),
@@ -14,12 +13,14 @@ let gulp			= require ('gulp'),
 	del				= require('del'),				//удаляет папку проекта
 	plumber			= require('gulp-plumber'),		// обработчик ошибок
 	notify			= require('gulp-notify'),
+	cleanCSS		= require('gulp-clean-css'),
+	gulpif			= require('gulp-if'),
+	argv 			= require('yargs').argv,
 
 	imagemin		= require('gulp-imagemin'), // Подключаем библиотеку для работы с изображениями
     pngquant		= require('imagemin-pngquant'), // Подключаем библиотеку для работы с png
 	cache			= require('gulp-cache'), // Подключаем библиотеку кеширования
 	util			= require('gulp-util');
-
 	
 	let path = {
 		build: { //Тут мы укажем куда складывать готовые после сборки файлы
@@ -45,12 +46,23 @@ let gulp			= require ('gulp'),
 			img:	'src/img/**/*.*',
 			fonts:	'src/fonts/**/*.*'
 		},
-		clean: 'build',
-		produc:'111/poliakh.github.io/03-Maket'
+		dir: 'build',
+		produc:'111/',
+		test : 'test'
 	};
+
+
 gulp.task('my', () => {
 	console.log('hello world!!!');
-	// content
+});
+
+gulp.task('del', () => {
+	del.sync('node_modules');
+});
+
+gulp.task('create', () => {
+	gulp.src('*.*', {read: false})
+	// .pipe(gulp.dest('./test/css'))
 });
 
 // watch
@@ -61,17 +73,17 @@ gulp.task('default',['build','server'], () => {
 	gulp.watch(path.watch.img, ['img']);
 });
 
+gulp.task('export', ()=>{
+		gulp.src(path.build.html + '**/*.*')
+	.pipe(gulpif(argv.prod, gulp.dest(path.produc)));
+
+})
 //Сборка проекта
 gulp.task('build',['clean','htmlmin','sass','script','img'], () => {
 	gulp.src(path.src.fonts)
 		.pipe(gulp.dest(path.build.fonts));
 });
-gulp.task('prod',['clean','htmlmin_prod','sass_prod','script','img'], () => {
-	gulp.src(path.src.fonts)
-		.pipe(gulp.dest(path.build.fonts));
-	gulp.src(path.build)
-		.pipe(gulp.dest(path.product));
-});
+
 
 //posthtml-include, posthtml-minifier или htmlnano.
 gulp.task('htmlmin', () => {
@@ -79,24 +91,9 @@ gulp.task('htmlmin', () => {
 		.pipe(sourcemaps.init())
 		.pipe(plumber())
 		.pipe(gulpImport('src/blocks/'))
-		.pipe(htmlMin({
-			// collapseWhitespace: true,
-			// removeComments: true
-		}))
-		.pipe(sourcemaps.write())
-		.pipe(gulp.dest(path.build.html))
-		.pipe(browserSync.reload({stream:true}));
-});
-gulp.task('htmlmin_prod', () => {
-	gulp.src(path.src.html)
-		// .pipe(sourcemaps.init())
-		.pipe(plumber())
-		.pipe(gulpImport('src/blocks/'))
-		.pipe(htmlMin({
-			collapseWhitespace: true,
-			removeComments: true
-		}))
-		// .pipe(sourcemaps.write())
+		.pipe(gulpif(argv.prod,
+			htmlMin({collapseWhitespace: true,removeComments: true})))
+		.pipe(gulpif(!argv.prod, sourcemaps.write()))
 		.pipe(gulp.dest(path.build.html))
 		.pipe(browserSync.reload({stream:true}));
 });
@@ -105,57 +102,26 @@ gulp.task('htmlmin_prod', () => {
 gulp.task('sass', () => {
 	gulp.src(path.src.scss)
 	.pipe(sourcemaps.init())
-	.pipe( sass(/* {outputStyle: 'compressed'} */)
-			.on( 'error', notify.onError(		//второе решение
+	.pipe( sass()
+			.on( 'error', notify.onError(
 				{
 					message: "<%= error.message %>",
 					title  : "Sass Error!",
-				} ),util.beep() )
-		)
-		// .pipe(sass({
-		// 	outputStyle: 'compressed'
-		// 	}))
-		// .pipe(concat('style.css'))
+				} )
+			))
+	.pipe(autoprefixer(
+		['last 3 version', '> 1%', 'ie 8', 'ie 7'],
+		{cascade: true}))
 		// .pipe(cssnano())
-		.pipe(autoprefixer(
-			['last 3 version', '> 1%', 'ie 8', 'ie 7'],
-			{cascade: true}))
-		.pipe(sourcemaps.write())
+		.pipe(gulpif(argv.prod, cleanCSS({debug: true}, (details) => {
+			console.log(`${details.name}: ${details.stats.originalSize}`);
+			console.log(`${details.name}: ${details.stats.minifiedSize}`);
+		})))
+		.pipe(gulpif(!argv.prod, sourcemaps.write('.')))
 		.pipe(gulp.dest(path.build.style))
-		.pipe(browserSync.reload({stream:true}));
-});
+		.pipe(browserSync.reload({stream:true}))
+	});
 
-gulp.task('sass_prod', () => {
-	gulp.src(path.src.scss)
-	// .pipe(sourcemaps.init())
-	.pipe( sass({outputStyle: 'compressed'})
-			.on( 'error', notify.onError(		//второе решение
-				{
-					message: "<%= error.message %>",
-					title  : "Sass Error!",
-				} ),util.beep() )
-		)
-		.pipe(sass({
-			outputStyle: 'compressed'
-			}))
-		.pipe(concat('style.css'))
-		.pipe(cssnano())
-		.pipe(autoprefixer(
-			['last 3 version', '> 1%', 'ie 8', 'ie 7'],
-			{cascade: true}))
-		// .pipe(sourcemaps.write())
-		.pipe(gulp.dest(path.build.style))
-		.pipe(browserSync.reload({stream:true}));
-});
-
-
-errorHandler = (error) => {
-    // 3 beeps for error
-    util.beep();
-    util.beep();
-    util.beep();
-    return true;
-};
 
 //css - работает
 // gulp.task('style',['sass'], () => {
@@ -188,7 +154,7 @@ gulp.task('server',() => {
 		server:{
 			baseDir:'build'
 		},
-		notify:true //отклювение уведомлений false
+		notify:true //отключение уведомлений false
 	})
 });
 
@@ -206,13 +172,10 @@ gulp.task('img', () => {
 
 //удаление папки дистрибутива
 gulp.task('clean', () => {
-	del.sync(path.clean);
+	del.sync(path.dir);
 });
 
 //чистка кеша в случае проблемс картинками например.
 gulp.task('clear',  () => { 
 	cache.clearAll();
 })
-
-
-
