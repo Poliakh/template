@@ -31,6 +31,7 @@ let gulp			= require ('gulp'),
 			fonts:	'build/fonts/'
 		},
 		src: { //Пути откуда брать исходники
+			block:'src/blocks',
 			html:	'src/*.html', //Синтаксис src/*.html говорит gulp что мы хотим взять все файлы с расширением .html
 			js:		'src/script/**/*.js',//В стилях и скриптах нам понадобятся только main файлы
 			scss:	'src/scss/style.scss',
@@ -56,10 +57,6 @@ gulp.task('my', () => {
 	console.log('hello world!!!');
 });
 
-gulp.task('del', () => {
-	del.sync('node_modules');
-});
-
 gulp.task('create', () => {
 	gulp.src('*.*', {read: false})
 	// .pipe(gulp.dest('./test/css'))
@@ -72,8 +69,8 @@ gulp.task('default',['build','server'], () => {
 	gulp.watch(path.watch.js, ['script']);
 	gulp.watch(path.watch.img, ['img']);
 });
-
-gulp.task('export', ()=>{
+// для запуска   gulp export --prod
+gulp.task('export',['build'], ()=>{
 		gulp.src(path.build.html + '**/*.*')
 	.pipe(gulpif(argv.prod, gulp.dest(path.produc)));
 
@@ -90,7 +87,7 @@ gulp.task('htmlmin', () => {
 	gulp.src(path.src.html)
 		.pipe(sourcemaps.init())
 		.pipe(plumber())
-		.pipe(gulpImport('src/blocks/'))
+		.pipe(gulpImport(path.src.blocks))
 		.pipe(gulpif(argv.prod,
 			htmlMin({collapseWhitespace: true,removeComments: true})))
 		.pipe(gulpif(!argv.prod, sourcemaps.write()))
