@@ -41,14 +41,14 @@ let gulp			= require ('gulp'),
 		},
 		watch: { //Тут мы укажем, за изменением каких файлов мы хотим наблюдать
 			html:	'src/**/*.html',
-			js:		'src/js/**/*.js',
+			js:		'src/script/**/*.js',
 			scss:	'src/scss/**/*.scss',
 			css:	'src/css/**/*.css',
 			img:	'src/img/**/*.*',
 			fonts:	'src/fonts/**/*.*'
 		},
 		dir: 'build',
-		produc:'111/',
+		produc:'production/',
 		test : 'test'
 	};
 
@@ -59,7 +59,7 @@ gulp.task('my', () => {
 
 gulp.task('create', () => {
 	gulp.src('*.*', {read: false})
-	// .pipe(gulp.dest('./test/css'))
+	.pipe(gulp.dest('./test/css'))
 });
 
 // watch
@@ -140,10 +140,10 @@ gulp.task('script', () => {
 		.pipe(babel({
 			presets: ['@babel/env']
 		}))
-		.pipe(uglify())//минимазция js
-		.pipe(sourcemaps.write())
+		.pipe(gulpif(argv.prod, uglify()))//минимазция js
+		.pipe(gulpif(!argv.prod, sourcemaps.write()))
 		.pipe(gulp.dest(path.build.js))
-		.pipe(browserSync.reload({stream:true}));
+		// .pipe(browserSync.reload({stream:true})); //незачем
 });
 
 gulp.task('server',() => {
