@@ -31,7 +31,7 @@ let gulp			= require ('gulp'),
 			fonts:	'build/fonts/'
 		},
 		src: { //Пути откуда брать исходники
-			block:'src/blocks',
+			block:'src/blocks/',
 			html:	'src/*.html', //Синтаксис src/*.html говорит gulp что мы хотим взять все файлы с расширением .html
 			js:		'src/script/**/*.js',//В стилях и скриптах нам понадобятся только main файлы
 			scss:	'src/scss/style.scss',
@@ -100,7 +100,7 @@ gulp.task('htmlmin', ()=>{
 	gulp.src(path.src.html)
 		.pipe(sourcemaps.init())
 		.pipe(plumber())
-		.pipe(gulpImport(path.src.blocks))
+		.pipe(gulpImport(path.src.block))
 		.pipe(gulpif(argv.prod,
 			htmlMin({collapseWhitespace: true,removeComments: true})))
 		.pipe(gulpif(!argv.prod, sourcemaps.write()))
