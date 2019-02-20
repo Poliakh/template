@@ -143,7 +143,6 @@ gulp.task('sass', ()=>{
 // 		.pipe(browserSync.reload({stream:true}));
 // });
 
-
 //script
 gulp.task('script', ()=>{
 	gulp.src(path.src.js)
