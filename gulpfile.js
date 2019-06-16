@@ -2,7 +2,9 @@ let gulp			= require ('gulp'),
 	sass			= require('gulp-sass'),
 	sourcemaps		= require('gulp-sourcemaps'),
 	autoprefixer	= require('gulp-autoprefixer'),
-	gulpImport		= require('gulp-html-import'),
+	// gulpImport		= require('gulp-html-import'), проблемы с форматированием
+	rigger 			= require('gulp-rigger');// импорт частей файлов
+
 	htmlMin			= require('gulp-htmlmin'),
 	browserSync		= require('browser-sync'),		//виртуальный браузер
 	concat			= require('gulp-concat'),
@@ -22,7 +24,8 @@ let gulp			= require ('gulp'),
 	pngquant		= require('imagemin-pngquant'), // Подключаем библиотеку для работы с png
 	imageminWebp = require('imagemin-webp'),
 	cache			= require('gulp-cache'), // Подключаем библиотеку кеширования
-	util			= require('gulp-util');
+	util			= require('gulp-util')
+
 	
 	let path = {
 		build: { //Тут мы укажем куда складывать готовые после сборки файлы
@@ -109,9 +112,11 @@ gulp.task('htmlmin', ()=>{
 	gulp.src(path.src.html)
 		.pipe(sourcemaps.init())
 		.pipe(plumber())
-		.pipe(gulpImport(path.src.block))
-		.pipe(gulpImport(path.src.block))
-		.pipe(gulpImport(path.src.block + 'other/'))
+		.pipe(rigger())
+
+		// .pipe(gulpImport(path.src.block))
+		// .pipe(gulpImport(path.src.block))
+		// .pipe(gulpImport(path.src.block + 'other/'))
 		.pipe(gulpif(argv.prod,
 			htmlMin({collapseWhitespace: true,removeComments: true})))
 		.pipe(gulpif(!argv.prod, sourcemaps.write()))
