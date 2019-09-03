@@ -37,7 +37,7 @@ let gulp			= require ('gulp'),
 		},
 		src: { //Пути откуда брать исходники
 			src:'src/',
-			block:'src/blocks/',
+			components:'src/components/',
 			html:	'src/*.html', //Синтаксис src/*.html говорит gulp что мы хотим взять все файлы с расширением .html
 			js:		'src/script/**/*.js',//В стилях и скриптах нам понадобятся только main файлы
 			scss:	'src/scss/style.scss',
@@ -47,7 +47,7 @@ let gulp			= require ('gulp'),
 		},
 		watch: { //Тут мы укажем, за изменением каких файлов мы хотим наблюдать
 			html:	'src/**/*.html',
-			block:	'src/blocks',
+			components:	'src/components',
 			js:		'src/script/**/*.js',
 			scss:	'src/scss/**/*.scss',
 			css:	'src/css/**/*.css',
@@ -55,7 +55,8 @@ let gulp			= require ('gulp'),
 			fonts:	'src/fonts/**/*.*'
 		},
 		dir: 'build',
-		produc:'../poliakh.github.io/myportfolio',
+		// produc:'../poliakh.github.io/myportfolio',
+		produc:'./production',
 		test : 'test'
 	};
 
@@ -83,7 +84,7 @@ gulp.task('default',['build','server'], ()=>{
 	gulp.watch(path.watch.img, ['img']);
 });
 //-------------- для запуска версии prodaction-----------------
-//	gulp build --prod  - создает версию с компрессией
+//	gulp build --prod - создает версию с компрессией
 //	gulp prod - переносит в папку  prodaction
 //---------------------end-----------------------------------
 gulp.task('ex',['build','prod'], ()=>{
@@ -114,9 +115,9 @@ gulp.task('htmlmin', ()=>{
 		.pipe(plumber())
 		.pipe(rigger())
 
-		// .pipe(gulpImport(path.src.block))
-		// .pipe(gulpImport(path.src.block))
-		// .pipe(gulpImport(path.src.block + 'other/'))
+		// .pipe(gulpImport(path.src.components))
+		// .pipe(gulpImport(path.src.components))
+		// .pipe(gulpImport(path.src.components + 'other/'))
 		.pipe(gulpif(argv.prod,
 			htmlMin({collapseWhitespace: true,removeComments: true})))
 		.pipe(gulpif(!argv.prod, sourcemaps.write()))
