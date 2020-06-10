@@ -1,0 +1,45 @@
+@import "fonts";
+
+@mixin font($font_name, $file_name, $weight, $style) {
+	@font-face {
+		font-family: $font_name;
+		font-display: swap;
+		src: url("../fonts/#{$file_name}.woff") format("woff"), url("../fonts/#{$file_name}.woff2") format("woff2");
+		font-weight: #{$weight};
+		font-style: #{$style};
+	}
+}
+
+// for tamplate
+
+body {
+	background-color: rgb(108, 106, 103);
+}
+h1 {
+	color: rgb(255, 255, 255);
+}
+
+body {
+	font-size: 15px;
+	display: flex;
+}
+div {
+	background: url("../images/screen.jpg") no-repeat center;
+	background-size: contain;
+	transition: background 0.3s;
+}
+span {
+	font-size: 20px;
+	@media (max-width: 767px) {
+		font-size: 15px;
+	}
+}
+div {
+	width: 500px;
+	height: 500px;
+
+	font-size: 30px;
+	@media (max-width: 767px) {
+		font-size: 20px;
+	}
+}
