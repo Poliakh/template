@@ -185,7 +185,7 @@ gulp.task('server', () => {
 			host: 'myproject.dev',
 			open: 'external'
 		},
-		notify: true  false
+		notify: true // false
 	});
 });
 

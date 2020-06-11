@@ -1,6 +1,6 @@
-@@include('plugins/testWebP.js')// script for add webp from css
-//-----------------------------
+//= plugins/testWebP
 
-@@include('plugin.js')
+//= components/demo
 
 console.log("Hello World");
+

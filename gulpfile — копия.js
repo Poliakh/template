@@ -1,6 +1,7 @@
 const project_folder = "build";
 // const project_folder = require("path").basename(__dirname) // назовет конечную папку названием проекта.
 const source_folder = "#src";
+let fs = "fs";
 
 const path = {
 	build: {
@@ -58,7 +59,6 @@ const { src, dest } = require('gulp'),
 	ttf2woff = require('gulp-ttf2woff'),
 	ttf2woff2 = require('gulp-ttf2woff2'),
 	fonter = require('gulp-fonter'),
-	sourcemaps = require('gulp-sourcemaps'),
 	plumber = require('gulp-plumber');
 
 
@@ -86,7 +86,6 @@ function html() {
 
 function style() {
 	return src(path.src.scss)
-		.pipe(sourcemaps.init())
 		.pipe(
 			scss({
 				outputeStyle: "expanded"
@@ -100,7 +99,6 @@ function style() {
 			})
 		)
 		.pipe(webpcss())
-		.pipe(sourcemaps.write())
 		.pipe(dest(path.build.style))
 		.pipe(webpcss())
 		.pipe(clean_css())
@@ -116,7 +114,6 @@ function style() {
 
 function js() {
 	return src(path.src.js)
-	.pipe(sourcemaps.init())
 		.pipe(plumber())
 		.pipe(rigger())
 		.pipe(babel({
@@ -135,7 +132,6 @@ function js() {
 				"@babel/plugin-proposal-class-properties"
 			]
 		}))
-		.pipe(sourcemaps.write())
 		.pipe(dest(path.build.js))
 		.pipe(uglify())
 		.pipe(
@@ -201,6 +197,29 @@ gulp.task('svgSprite', function () {
 
 
 
+
+function fontsStyle(params) {
+	let file_content = fs.readFileSync(source_folder + '/scss/fonts.scss');
+	if (file_content == '') {
+		fs.writeFile(source_folder + '/scss/fonts.scss', '', cb);
+		return fs.readdir(path.build.fonts, function (err, items) {
+			if (items) {
+				let c_fontname;
+				for (var i = 0; i < items.length; i++) {
+					let fontname = items[i].split('.');
+					fontname = fontname[0];
+					if (c_fontname != fontname) {
+						fs.appendFile(source_folder + '/scss/fonts.scss', '@include font("' + fontname + '", "' + fontname + '", "400", "normal");\r\n', cb);
+					} c_fontname = fontname;
+				}
+			}
+		})
+	}
+}
+
+function cb() {
+}
+
 function watchFile() {
 	gulp.watch([path.watch.html], html);
 	gulp.watch([path.watch.scss], style);
@@ -212,10 +231,11 @@ function clean() {
 	return del(path.clean);
 };
 
-const build = gulp.series(clean, gulp.parallel(js, style, html, images, fonts));
+const build = gulp.series(clean, gulp.parallel(js, style, html, images, fonts),fontsStyle);
 
 const watch = gulp.parallel(build, watchFile, browserSync);
 
+exports.fontsStyle = fontsStyle;
 exports.fonts = fonts;
 exports.images = images;
 exports.js = js;

@@ -1,20 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="icon" href="images/favicon.ico" type="image/x-icon">
 	<link rel="stylesheet" href="./css/style.min.css">
-	<title>Blank tamplate</title>
+	<title>Tamplate</title>
 </head>
+
 <body>
-	<h1>Blank tamplate</h1>
-		@@include('components/_header.html')
+	<div class="wrap">
+		//= blocks/header
 		<main>
-			main 
-			<img width="200px" height="auto" src="images/cheshirecat.png" alt="cat">
+			<div class="container">
+				<h2>main</h2>
+			</div>
 		</main>
+		//= blocks/footer
+	</div>
+
+
+	<h1>Blank tamplate</h1>
+	//= blocks/demo.html
+	<main>
+		main
+		<img width="200px" height="auto" src="images/image.jpg" alt="image">
+	</main>
 	<script src="./script/script.min.js"></script>
 	<div></div>
 </body>
+
 </html>
