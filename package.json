@@ -14,9 +14,15 @@
     "@babel/polyfill": "^7.10.1",
     "@babel/preset-env": "^7.10.2",
     "browser-sync": "^2.26.7",
+<<<<<<< HEAD
     "del": "^5.1.0",
     "gulp": "^4.0.2",
     "gulp-autoprefixer": "^7.0.1",
+=======
+    "del": "^3.0.0",
+    "gulp": "^4.0.2",
+    "gulp-autoprefixer": "^6.1.0",
+>>>>>>> b8507e99bec764c805e6d5cb520750310ded4da7
     "gulp-babel": "^8.0.0",
     "gulp-clean-css": "^4.3.0",
     "gulp-fonter": "^0.3.0",
@@ -27,6 +33,7 @@
     "gulp-rigger": "^0.5.8",
     "gulp-sass": "^4.1.0",
     "gulp-sourcemaps": "^2.6.5",
+<<<<<<< HEAD
     "gulp-ttf2woff": "^1.1.1",
     "gulp-ttf2woff2": "^3.0.0",
     "gulp-uglify-es": "^2.0.0",
@@ -34,5 +41,15 @@
     "gulp-webp-html": "^1.0.2",
     "gulp-webpcss": "^1.1.1",
     "posthtml-include": "^1.4.3"
+=======
+    "gulp-uglifyjs": "^0.6.2",
+    "imagemin-pngquant": "^8.0.0",
+    "node-sass": "^4.14.1"
+  },
+  "dependencies": {
+    "gulp-if": "^2.0.2",
+    "imagemin-webp": "^5.1.0",
+    "yargs": "^15.3.1"
+>>>>>>> b8507e99bec764c805e6d5cb520750310ded4da7
   }
 }

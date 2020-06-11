@@ -70,8 +70,120 @@ function browserSync(params) {
 		server: {
 			baseDir: "./" + project_folder + "/"
 		},
+<<<<<<< HEAD
 		port: 3000,
 		notify: false
+=======
+		src: { //Пути откуда брать исходники
+			src:'src/',
+			block:'src/blocks/',
+			html:	'src/*.html', //Синтаксис src/*.html говорит gulp что мы хотим взять все файлы с расширением .html
+			js:		'src/script/**/*.js',//В стилях и скриптах нам понадобятся только main файлы
+			scss:	'src/scss/style.scss',
+			css:	'src/css/**/*.css',
+			img:	'src/img/**/*.*', //Синтаксис img/**/*.* означает - взять все файлы всех расширений из папки и из вложенных каталогов
+			fonts:	'src/fonts/**/*.*'
+		},
+		watch: { //Тут мы укажем, за изменением каких файлов мы хотим наблюдать
+			html:	'src/**/*.html',
+			block:	'src/blocks',
+			js:		'src/script/**/*.js',
+			scss:	'src/scss/**/*.scss',
+			css:	'src/css/**/*.css',
+			img:	'src/img/**/*.*',
+			fonts:	'src/fonts/**/*.*'
+		},
+		dir: 'build',
+		produc:'production',
+		test : 'test'
+	};
+
+
+gulp.task('my', ()=>{
+	// console.log('hello world!!!');
+	gulp.src(path.src.scss)
+	.pipe(gulp.dest(path.produc))
+
+});
+
+gulp.task('create', ()=>{
+	// gulp.src('*.*', {read: false})
+	gulp.start('build');
+	gulp.start('my');
+	gulp.src(path.dir)
+		.pipe(gulp.dest(path.produc))
+});
+
+// watch
+gulp.task('default',['build','server'], ()=>{
+	gulp.watch(path.watch.html, ['htmlmin']);
+	gulp.watch(path.watch.scss, ['sass']);
+	gulp.watch(path.watch.js, ['script']);
+	gulp.watch(path.watch.img, ['img']);
+});
+//-------------- для запуска версии prodaction-----------------
+//	gulp build --prod  - создает версию с компрессией
+//	gulp prod - переносит в папку  prodaction
+//---------------------end-----------------------------------
+gulp.task('ex',['build','prod'], ()=>{
+	// gulp.start('prod')
+	// gulp.src(path.dir)
+	// .pipe(gulp.dest(path.produc));
+	// .pipe(gulpif(argv.prod, gulp.dest(path.produc)));
+})
+gulp.task('prod',['cleanProd'],()=>{
+	gulp.src(path.dir+'/**/*.*')
+		.pipe(gulp.dest(path.produc));
+});
+//Сборка проекта
+gulp.task('build',['clean','htmlmin','sass','script','img'], ()=>{
+	gulp.src(path.src.fonts)
+		.pipe(gulp.dest(path.build.fonts));
+	gulp.src(path.src.src + '/*.json')
+		.pipe(gulp.dest(path.build.html));
+	gulp.src(path.src.src + '/preview')
+		.pipe(gulp.dest(path.build.html));
+});
+
+
+//posthtml-include, posthtml-minifier или htmlnano.
+gulp.task('htmlmin', ()=>{
+	gulp.src(path.src.html)
+		.pipe(sourcemaps.init())
+		.pipe(plumber())
+		.pipe(gulpImport(path.src.block))
+		.pipe(gulpImport(path.src.block))
+		.pipe(gulpImport(path.src.block + 'other/'))
+		.pipe(gulpif(argv.prod,
+			htmlMin({collapseWhitespace: true,removeComments: true})))
+		.pipe(gulpif(!argv.prod, sourcemaps.write()))
+		.pipe(gulp.dest(path.build.html))
+		.pipe(browserSync.reload({stream:true}));
+});
+
+//style
+gulp.task('sass', ()=>{
+	gulp.src(path.src.scss)
+	.pipe(sourcemaps.init())
+	.pipe( sass()
+			.on( 'error', notify.onError(
+				{
+					message: "<%= error.message %>",
+					title  : "Sass Error!",
+				} )
+			))
+	.pipe(autoprefixer(
+		['last 3 version', '> 1%', 'ie 8', 'ie 7'],
+		{cascade: true}))
+		// .pipe(cssnano())
+		.pipe(gulpif(argv.prod, cleanCSS({debug: true}, (details) => {
+			console.log(`${details.name}: ${details.stats.originalSize}`);
+			console.log(`${details.name}: ${details.stats.minifiedSize}`);
+		})))
+		.pipe(gulpif(!argv.prod, sourcemaps.write('.')))
+		.pipe(gulp.dest(path.build.style))
+		.pipe(browserSync.reload({stream:true}))
+>>>>>>> b8507e99bec764c805e6d5cb520750310ded4da7
 	});
 };
 
