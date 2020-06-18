@@ -1,4 +1,5 @@
 //= plugins/testWebP
+//= plugins/grids
 
 //= components/demo
 

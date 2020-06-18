@@ -1,0 +1,108 @@
+:root {
+	--ofs: 15px;//боковые отсупы
+	--col-1: calc(100% / 12 - var(--ofs) * 2);
+	--col-2: calc(100% / 12 * 2 - var(--ofs) * 2);
+	--col-3: calc(100% / 12 * 3 - var(--ofs) * 2);
+	--col-4: calc(100% / 12 * 4 - var(--ofs) * 2);
+	--col-5: calc(100% / 12 * 5 - var(--ofs) * 2);
+	--col-6: calc(100% / 12 * 6 - var(--ofs) * 2);
+	--col-7: calc(100% / 12 * 7 - var(--ofs) * 2);
+	--col-8: calc(100% / 12 * 8 - var(--ofs) * 2);
+	--col-9: calc(100% / 12 * 9 - var(--ofs) * 2);
+	--col-10: calc(100% / 12 * 10 - var(--ofs) * 2);
+	--col-11: calc(100% / 12 * 11 - var(--ofs) * 2);
+	--col-12: calc(100% / 12 * 12 - var(--ofs) * 2);
+}
+
+.grid {
+	background-color: rgba(255, 0, 0, 0.1);
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	pointer-events: none;
+	display: flex;
+}
+
+.wrapGrid {
+	position: absolute;
+	display: flex;
+	height: 100%;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 0.3s;
+}
+.vis.wrapGrid{
+	opacity:.8;
+}
+.col {
+	background-color: rgba(0, 128, 0, 0.1);
+	min-height: 100%;
+	margin: 0 var(--ofs);
+	width: calc(100% / 12 - var(--ofs) * 2);
+}
+
+.gridOn {
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	border: none;
+	background-color: gray;
+	position: absolute;
+	right: 20px;
+	top: 20px;
+	opacity: 0.05;
+	transition: opacity 0.3s;
+	pointer-events: all;
+	outline: none;
+	&:after {
+		display: block;
+		content: "⌗";
+		width: 20px;
+		height: 20px;
+		color: white;
+		margin: 0 auto;
+		line-height: 24px;
+		transition: color .3s;
+	}
+	&:hover {
+		opacity: 0.8;
+		transition: opacity 1s ease-in-out;
+	}
+	&:active{
+		&:after{
+			color: rgb(0, 0, 0);
+		}
+	}
+	&:hover + .wrapGrid {
+		opacity: .6;
+		transition: opacity 1s;
+	}
+}
+// demonstration
+
+.wraper {
+	display: flex;
+	flex-wrap: wrap;
+	margin: 0 -15px ; // = var(ofs) обязательно задать контейнеру блока
+}
+.content,
+.content2,
+.content3 {
+	background-color: rgba(0, 0, 255, 0.4);
+	height: 50px;
+	width: var(--col-6);
+	margin: 0 var(--ofs);
+	margin-top: 30px;
+}
+.content2 {
+	width: var(--col-4);
+}
+.content3 {
+	width: var(--col-2);
+}

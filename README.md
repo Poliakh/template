@@ -1,6 +1,5 @@
 [Инструкция](https://github.com/Poliakh/myhelp/blob/master/help.md)  
 ---
-<<<<<<< HEAD
 основан на [примере](https://www.youtube.com/watch?v=stFOy0Noahg)  
 `npm i` - установка проекта
 `gulp` - запуск сборщика
@@ -26,10 +25,9 @@
 	</picture>
 ```
 В папке **[script/plugin]** находится **testWebP.js**  - предназначен для автоматического добавления в стилях ссылок на картинки в формате webp.
-=======
-`npm i` - установка модулей  
-`gulp` - запуск сборщика  
 
-`gulp build --prod` - сборка версии production  
-`gulp prod` - переложить папку (указать путь gulpfile.js )
->>>>>>> b8507e99bec764c805e6d5cb520750310ded4da7
+**отображение сетки**
+подключить стили  
+*_grids.scss,*  
+*-grids.js*  
+справа вверху на странице шаблона появится кнопка активации сетки.

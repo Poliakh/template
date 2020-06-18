@@ -1,6 +1,7 @@
 
 @import 'container';
 @import 'demo';
+@import '_grid';
 
 * {
 	margin: 0;
@@ -17,3 +18,5 @@ html,
 body {
 	scroll-behavior: smooth;
 }
+
+
