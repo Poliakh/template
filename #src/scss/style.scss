@@ -1,8 +1,9 @@
 
 @import 'container';
-@import 'demo';
 @import '_footer';
 @import '_grid';
+@import '_grid-demo';
+@import 'demo';
 
 * {
 	margin: 0;
@@ -19,5 +20,7 @@ html,
 body {
 	scroll-behavior: smooth;
 }
-
+picture{//??
+	width: 100%;
+}
 

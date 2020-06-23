@@ -1,13 +1,9 @@
 .wrap{
 	display: flex;
 	width: 100%;
-	// min-height: 100%;
 	overflow: hidden;
 	flex-direction: column;
 	justify-content: flex-start;
-	// align-items: center;
-
-	// min-width: 350px;
 	min-height: 100vh;
 }
 
@@ -17,5 +13,5 @@
 	padding: 0 15px;
 	width: 100%;
 	min-width:320px;
-	min-height: 100%t;
+	min-height: 100%;
 }
