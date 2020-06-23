@@ -47,7 +47,6 @@ const { src, dest } = require('gulp'),
 	scss = require('gulp-sass'),
 	autoprefixer = require('gulp-autoprefixer'),
 	group_media = require('gulp-group-css-media-queries'),
-	clean_css = require('gulp-clean-css'),
 	rename = require('gulp-rename'),
 	uglify = require('gulp-uglify-es').default,
 	babel = require('gulp-babel'),
@@ -59,13 +58,15 @@ const { src, dest } = require('gulp'),
 	ttf2woff2 = require('gulp-ttf2woff2'),
 	fonter = require('gulp-fonter'),
 	sourcemaps = require('gulp-sourcemaps'),
-	plumber = require('gulp-plumber');
+	plumber = require('gulp-plumber'),
+	// strip = require('gulp-strip-comments'),//устанвить после создания условий для  prodaction
+	cssnano = require('gulp-cssnano');
 
 
 
 
 
-function browserSync(params) {
+function browserSync() {
 	browsersync.init({
 		server: {
 			baseDir: "./" + project_folder + "/"
@@ -100,10 +101,10 @@ function style() {
 			})
 		)
 		.pipe(webpcss())
-		.pipe(sourcemaps.write())
+		.pipe(sourcemaps.write('.'))
 		.pipe(dest(path.build.style))
 		.pipe(webpcss())
-		.pipe(clean_css())
+		.pipe(cssnano())
 		.pipe(
 			rename({
 				extname: ".min.css"
@@ -125,17 +126,18 @@ function js() {
 				{
 					"debug": true,//отобразит поддерживаемы браузеры в терминале и список примененных плагинов для адаптации
 					"targets": [
-						"last 3 chrome versions",
-						"last 3 firefox versions",
-						"last 3 edge versions",
-						"last 3 ios versions"
+						'last 2 versions', 'not dead', '> 0.2%'
+						// "last 3 chrome versions",
+						// "last 3 firefox versions",
+						// "last 3 edge versions",
+						// "last 3 ios versions"
 					]
 				}]],
 			plugins: [
 				"@babel/plugin-proposal-class-properties"
 			]
 		}))
-		.pipe(sourcemaps.write())
+		.pipe(sourcemaps.write('.'))
 		.pipe(dest(path.build.js))
 		.pipe(uglify())
 		.pipe(
