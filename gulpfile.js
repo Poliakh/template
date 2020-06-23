@@ -101,7 +101,7 @@ function style() {
 			})
 		)
 		.pipe(webpcss())
-		.pipe(sourcemaps.write())
+		.pipe(sourcemaps.write('.'))
 		.pipe(dest(path.build.style))
 		// .pipe(webpcss())
 		.pipe(cssnano())
