@@ -1,5 +1,6 @@
 //= plugins/testWebP
 //= plugins/grids
+//= plugins/myMethod
 
 //= components/demo
 
