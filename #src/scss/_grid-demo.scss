@@ -57,7 +57,7 @@
 	}
 	&:hover {
 		opacity: 0.8;
-		transition: opacity 1s ease-in-out;
+		transition: opacity .15s ease-in-out;
 	}
 	&:active{
 		&:after{
@@ -66,7 +66,7 @@
 	}
 	&:hover + .wrapGrid {
 		opacity: .6;
-		transition: opacity 1s;
+		transition: opacity .15s;
 	}
 }
 // demonstration
