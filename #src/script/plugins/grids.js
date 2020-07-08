@@ -1,4 +1,4 @@
-// for displays the grid on the page 
+/* for displays the grid on the page  */
 
 const grids =
 	`<button class="gridOn"></button>
@@ -18,20 +18,25 @@ const grids =
 		<div class="col"></div>
 	</div>
 </div>`;
-const body = document.body;
-body.insertAdjacentHTML('afterend', grids);
+
+document.body.insertAdjacentHTML('afterend', grids);
 
 const onGrid = () => {
-	grid.classList.toggle('vis')
-	if(localStorage.grids === 'on'){
-	localStorage.grids = 'off';
-	} else{
+	console.log(grid);
+	console.log(grid.matches('.vis'));
+	
+	if(grid.matches('.vis')){
+		grid.classList.remove('vis');
+		localStorage.grids = 'off';
+	}else{
+		grid.classList.add('vis')
 		localStorage.grids = 'on';
+
 	}
 };
-const gridOn = document.querySelector('.gridOn');
-gridOn.addEventListener('click', onGrid)
+
+document.querySelector('.gridOn').addEventListener('click', onGrid);
 
 if (localStorage.grids === 'on'){
 	grid.classList.add('vis')
-}
+};

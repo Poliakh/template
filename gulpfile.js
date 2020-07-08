@@ -119,7 +119,7 @@ function js() {
 	return src(path.src.js)
 	.pipe(sourcemaps.init())
 		.pipe(plumber())
-		.pipe(rigger())
+		.pipe(rigger())//в конце инклудов не должно бюыть пробелов
 		.pipe(babel({
 			presets: [[
 				"@babel/env",
@@ -127,10 +127,7 @@ function js() {
 					"debug": false,//отобразит поддерживаемы браузеры в терминале и список примененных плагинов для адаптации
 					"targets": [
 						'last 2 versions', 'not dead', '> 0.2%'
-						// "last 3 chrome versions",
-						// "last 3 firefox versions",
-						// "last 3 edge versions",
-						// "last 3 ios versions"
+						// "last 3 chrome versions","last 3 firefox versions","last 3 edge versions","last 3 ios versions"
 					]
 				}]],
 			plugins: [

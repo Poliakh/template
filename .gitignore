@@ -1,9 +1,4 @@
 # игнорироем файл сборки и модули npm
 build/
-<<<<<<< HEAD
 node_modules/
 production/
-=======
-production/
-node_modules/
->>>>>>> b8507e99bec764c805e6d5cb520750310ded4da7
