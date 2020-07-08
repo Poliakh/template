@@ -1,6 +1,6 @@
 // method add wrap for alelemnts
 // usage exemple:
-// elem.wrap('div', 'wrapper');
+// elem.wrap('tag', 'classname');
 
 Object.prototype.wrap = function (tag='div',cls){
 	const parent = this.parentElement;

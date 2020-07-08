@@ -1,8 +1,8 @@
 //= plugins/testWebP
-//= plugins/grids
-//= plugins/myMethod
+//= plugins/grids //for displays the grid on the page 
+//= plugins/myMethod //here i add my methods
 
-//= components/demo
+//= components/demo 
 
 console.log("Hello World");
 
