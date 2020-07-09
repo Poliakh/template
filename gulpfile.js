@@ -1,6 +1,14 @@
-const project_folder = "build";
+/*
+ -------------- для запуска версии prodaction-----------------
+	gulp build - обычная сборка в папку  build
+	gulp prod - сжатая версия в папке prodгction
+	gulp - дефолтный запуск с вотчером
+---------------------end-----------------------------------
+*/
+const project_folder = "build",
+	production_folder = "production",
+	source_folder = "#src";
 // const project_folder = require("path").basename(__dirname) // назовет конечную папку названием проекта.
-const source_folder = "#src";
 
 const path = {
 	build: {
@@ -9,7 +17,6 @@ const path = {
 		style: project_folder + "/css/",
 		img: project_folder + "/images/",
 		fonts: project_folder + "/fonts/"
-
 	},
 	src: {
 		src: source_folder + "/",
@@ -32,9 +39,16 @@ const path = {
 		fonts: source_folder + "/fonts/**/*.*"
 	},
 	clean: "./" + project_folder + "/",
+	clean_prod: "./" + production_folder + "/",
 	// dir: "build",
 	// // produc:"../poliakh.github.io/myportfolio",
-	// produc: "dist",
+	prod:{
+		html: production_folder + "/",
+		js: production_folder + "/script/",
+		style: production_folder + "/css/",
+		img: production_folder + "/images/",
+		fonts: production_folder + "/fonts/"
+	}
 	// test: "test"
 };
 
@@ -43,6 +57,7 @@ const { src, dest } = require('gulp'),
 	browsersync = require('browser-sync').create(),
 	rigger = require('gulp-rigger'),
 	posthtml_include = require('posthtml-include'),
+	htmlMin = require('gulp-htmlmin'),
 	del = require('del'),
 	scss = require('gulp-sass'),
 	autoprefixer = require('gulp-autoprefixer'),
@@ -60,10 +75,17 @@ const { src, dest } = require('gulp'),
 	sourcemaps = require('gulp-sourcemaps'),
 	plumber = require('gulp-plumber'),
 	// strip = require('gulp-strip-comments'),//устанвить после создания условий для  prodaction
-	cssnano = require('gulp-cssnano');
+	cssnano = require('gulp-cssnano'),
+	gulpif = require('gulp-if'),
+	argv = require('yargs').argv;
 
+const flags = {
+	prod:false
+};
 
-
+async function flagProd() {
+	flags.prod = true;
+};
 
 
 function browserSync() {
@@ -78,10 +100,25 @@ function browserSync() {
 
 function html() {
 	return src(path.src.html)
+		.pipe(sourcemaps.init())
 		.pipe(plumber())
 		.pipe(rigger())
-		.pipe(webp_html())
-		.pipe(dest(path.build.html))
+		// .pipe(webp_html())
+		// .pipe(gulpif(argv.prod,
+		// 	htmlMin({
+		// 		collapseWhitespace: true,
+		// 		removeComments: true 
+		// 		})
+		// 	))
+		.pipe(gulpif(flags.prod,
+			htmlMin({
+				collapseWhitespace: true,
+				removeComments: true 
+				})
+			))
+		.pipe(gulpif(!flags.prod, sourcemaps.write()))
+		.pipe(gulpif(!flags.prod,dest(path.build.html )))
+		.pipe(gulpif(flags.prod,dest(path.prod.html )))
 		.pipe(browsersync.stream())
 }
 
@@ -96,55 +133,54 @@ function style() {
 		.pipe(group_media())
 		.pipe(
 			autoprefixer({
-				overrideBrowserslist: ["last 5 versions"],
+				overrideBrowserslist: ["last 3 versions"],
 				cascade: true
 			})
 		)
 		.pipe(webpcss())
-		.pipe(sourcemaps.write())
-		.pipe(dest(path.build.style))
-		// .pipe(webpcss())
-		.pipe(cssnano())
+		.pipe(gulpif(!flags.prod, sourcemaps.write()))
+		.pipe(gulpif(flags.prod, cssnano()))
 		.pipe(
 			rename({
 				extname: ".min.css"
 			})
 		)
-		.pipe(dest(path.build.style))
+		.pipe(gulpif(!flags.prod, sourcemaps.write()))
+		.pipe(gulpif(!flags.prod, dest(path.build.style )))
+		.pipe(gulpif(flags.prod, dest(path.prod.style )))
 		.pipe(browsersync.stream())
-
 }
 
 function js() {
 	return src(path.src.js)
 	.pipe(sourcemaps.init())
-		.pipe(plumber())
-		.pipe(rigger())//в конце инклудов не должно бюыть пробелов
-		.pipe(babel({
-			presets: [[
-				"@babel/env",
-				{
-					"debug": false,//отобразит поддерживаемы браузеры в терминале и список примененных плагинов для адаптации
-					"targets": [
-						'last 2 versions', 'not dead', '> 0.2%'
-						// "last 3 chrome versions","last 3 firefox versions","last 3 edge versions","last 3 ios versions"
-					]
-				}]],
-			plugins: [
-				"@babel/plugin-proposal-class-properties"
-			]
-		}))
-		.pipe(sourcemaps.write('.'))
-		.pipe(dest(path.build.js))
-		.pipe(uglify())
-		.pipe(
-			rename({
-				extname: ".min.js"
-			})
-		)
-		.pipe(dest(path.build.js))
-		.pipe(browsersync.stream())
-}
+	.pipe(plumber())
+	.pipe(rigger())//в конце инклудов не должно бюыть пробелов
+	.pipe(babel({
+		presets: [[
+			"@babel/env",
+			{
+				"debug": false,//отобразит поддерживаемы браузеры в терминале и список примененных плагинов для адаптации
+				"targets": [
+					'last 2 versions', 'not dead', '> 0.2%'
+					// "last 3 chrome versions","last 3 firefox versions","last 3 edge versions","last 3 ios versions"
+				]
+			}]],
+		plugins: [
+			"@babel/plugin-proposal-class-properties"
+		]
+	}))
+	.pipe(gulpif(flags.prod, uglify()))
+	.pipe(
+		rename({
+			extname: ".min.js"
+		})
+	)
+	.pipe(gulpif(!flags.prod, sourcemaps.write('.')))
+	.pipe(gulpif(!flags.prod, dest(path.build.js )))
+	.pipe(gulpif(flags.prod, dest(path.prod.js )))
+	.pipe(browsersync.stream())
+};
 
 function images() {
 	return src(path.src.img)
@@ -181,7 +217,7 @@ gulp.task('otf2ttf', function () {
 		.pipe(fonter({
 			formats: ['ttf']
 		}))
-		.pipe(dest(source_folder + '/■Fonts/'))
+		.pipe(dest(source_folder + '/Fonts/'))
 })
 
 gulp.task('svgSprite', function () {
@@ -198,8 +234,6 @@ gulp.task('svgSprite', function () {
 		.pipe(dest(path.build.img))
 })
 
-
-
 function watchFile() {
 	gulp.watch([path.watch.html], html);
 	gulp.watch([path.watch.scss], style);
@@ -210,8 +244,20 @@ function watchFile() {
 function clean() {
 	return del(path.clean);
 };
+function clean_prod() {
+	return del(path.clean_prod);
+};
+function otherProd() {
+	return src(path.build.fonts +  "/**/*.*")
+	.pipe(dest(path.prod.fonts))
+	.pipe(src(path.build.img + "/**/*.*"))
+	.pipe(dest(path.prod.img));
+
+}
 
 const build = gulp.series(clean, gulp.parallel(js, style, html, images, fonts));
+
+const build_prod = gulp.series(flagProd, clean_prod, gulp.parallel(js, style, html, images, fonts), otherProd);
 
 const watch = gulp.parallel(build, watchFile, browserSync);
 
@@ -221,5 +267,6 @@ exports.js = js;
 exports.scss = style;
 exports.html = html;
 exports.build = build;
+exports.prod = build_prod;
 exports.watch = watch;
 exports.default = watch;

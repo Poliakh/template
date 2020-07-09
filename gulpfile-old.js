@@ -105,7 +105,10 @@ gulp.task('htmlmin', () => {
 		// .pipe(gulpImport(path.src.components))
 		// .pipe(gulpImport(path.src.components + 'other/'))
 		.pipe(gulpif(argv.prod,
-			htmlMin({ collapseWhitespace: true, removeComments: true })))
+					htmlMin({
+						collapseWhitespace: true, removeComments: true 
+						})
+					))
 		.pipe(gulpif(!argv.prod, sourcemaps.write()))
 		.pipe(gulp.dest(path.build.html))
 		.pipe(browserSync.reload({ stream: true }));
