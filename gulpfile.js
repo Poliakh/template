@@ -5,9 +5,9 @@
 	gulp - дефолтный запуск с вотчером
 ---------------------end-----------------------------------
 */
-const project_folder = "build",
-	production_folder = "production",
-	source_folder = "#src";
+const	project_folder	= "build",
+		production_folder	= "production",
+		source_folder		= "#src";
 // const project_folder = require("path").basename(__dirname) // назовет конечную папку названием проекта.
 
 const path = {
@@ -40,8 +40,6 @@ const path = {
 	},
 	clean: "./" + project_folder + "/",
 	clean_prod: "./" + production_folder + "/",
-	// dir: "build",
-	// // produc:"../poliakh.github.io/myportfolio",
 	prod:{
 		html: production_folder + "/",
 		js: production_folder + "/script/",
@@ -76,8 +74,7 @@ const { src, dest } = require('gulp'),
 	plumber = require('gulp-plumber'),
 	// strip = require('gulp-strip-comments'),//устанвить после создания условий для  prodaction
 	cssnano = require('gulp-cssnano'),
-	gulpif = require('gulp-if'),
-	argv = require('yargs').argv;
+	gulpif = require('gulp-if');
 
 const flags = {
 	prod:false

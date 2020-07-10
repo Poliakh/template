@@ -35,7 +35,6 @@
     "gulp-webp": "^4.0.1",
     "gulp-webp-html": "^1.0.2",
     "gulp-webpcss": "^1.1.1",
-    "posthtml-include": "^1.4.3",
-    "yargs": "^15.4.0"
+    "posthtml-include": "^1.4.3"
   }
 }
