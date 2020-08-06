@@ -256,7 +256,7 @@ const build = gulp.series(clean, gulp.parallel(js, style, html, images, fonts));
 
 const build_prod = gulp.series(flagProd, clean_prod, gulp.parallel(js, style, html, images, fonts), otherProd);
 
-const watch = gulp.parallel(build, watchFile, browserSync);
+const watch = gulp.series(build, gulp.parallel(watchFile, browserSync));
 
 exports.fonts = fonts;
 exports.images = images;
