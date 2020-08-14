@@ -1,13 +1,15 @@
 
 .grid {
 	background-color: rgba(255, 0, 0, 0.1);
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
+	// position: absolute;
+	// top: 0;
+	// right: 0;
+	// bottom: 0;
+	// left: 0;
 	pointer-events: none;
 	display: flex;
+	min-height: 100%;
+	margin: 0 -15px;
 }
 
 .wrapGrid {
@@ -22,7 +24,7 @@
 	opacity: 0;
 	transition: opacity 0.3s;
 }
-.vis.wrapGrid{
+#grid.vis.wrapGrid{
 	opacity:.8;
 }
 .col {
@@ -30,6 +32,8 @@
 	min-height: 100%;
 	margin: 0 var(--ofs);
 	width: calc(100% / 12 - var(--ofs) * 2);
+	display: grid;
+	place-items: center;
 }
 
 .gridOn {
@@ -65,29 +69,47 @@
 		}
 	}
 	&:hover + .wrapGrid {
-		opacity: .6;
+		opacity: .5;
 		transition: opacity .15s;
 	}
 }
 // demonstration
 
-.wrapper {
+.wrapperContent {
 	display: flex;
 	flex-wrap: wrap;
+	min-width: 100%;
 	margin: 0 -15px ; // = var(ofs) обязательно задать контейнеру блока
 }
-.content,
+.content1,
 .content2,
-.content3 {
+.content3,
+.content4,
+.content5,
+.content6 {
 	background-color: rgba(0, 0, 255, 0.4);
 	height: 50px;
-	width: var(--col-6);
+	width: var(--col-1);
 	margin: 0 var(--ofs);
 	margin-top: 30px;
+	box-sizing: border-box;
 }
 .content2 {
-	width: var(--col-4);
-}
-.content3 {
 	width: var(--col-2);
 }
+
+.content3 {
+	width: var(--col-3);
+}
+.content4 {
+	width: var(--col-4);
+}
+.content5 {
+	width: var(--col-5);
+}
+.content6 {
+	width: var(--col-6);
+}
+// .content5 {
+// 	width: var(--col-5);
+// }

@@ -8,10 +8,15 @@
 }
 
 .container {
+	position: relative;
 	max-width: 1030px;
 	margin: 0 auto;
 	padding: 0 15px;
 	width: 100%;
 	min-width:320px;
 	min-height: 100%;
+	border-right: 1px blue solid;
+	border-left: 1px blue solid;
+	box-sizing: border-box ;
+	
 }
