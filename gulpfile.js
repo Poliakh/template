@@ -5,9 +5,11 @@
 	gulp - дефолтный запуск с вотчером
 ---------------------end-----------------------------------
 */
-const	project_folder	= "build",
-		production_folder	= "production",
-		source_folder		= "#src";
+// const project_folder = "C:/Open_Server/OSPanel/domains/gorelova",//home
+// const project_folder = "D:/Programs/OpenServer/domains/gorelova",//work
+const project_folder = "build",
+	production_folder = "production",
+	source_folder = "#src";
 // const project_folder = require("path").basename(__dirname) // назовет конечную папку названием проекта.
 
 const path = {
@@ -40,7 +42,7 @@ const path = {
 	},
 	clean: "./" + project_folder + "/",
 	clean_prod: "./" + production_folder + "/",
-	prod:{
+	prod: {
 		html: production_folder + "/",
 		js: production_folder + "/script/",
 		style: production_folder + "/css/",
@@ -75,9 +77,11 @@ const { src, dest } = require('gulp'),
 	// strip = require('gulp-strip-comments'),//устанвить после создания условий для  prodaction
 	cssnano = require('gulp-cssnano'),
 	gulpif = require('gulp-if');
+	webpack = require("webpack-stream");
+
 
 const flags = {
-	prod:false
+	prod: false
 };
 
 async function flagProd() {
@@ -90,6 +94,12 @@ function browserSync() {
 		server: {
 			baseDir: "./" + project_folder + "/"
 		},
+		ghostMode: {
+			clicks: false,
+			forms: false,
+			scroll: false
+		},
+
 		port: 3000,
 		notify: false
 	});
@@ -107,15 +117,20 @@ function html() {
 		// 		removeComments: true 
 		// 		})
 		// 	))
-		.pipe(gulpif(flags.prod,
-			htmlMin({
-				collapseWhitespace: true,
-				removeComments: true 
-				})
-			))
+		.pipe(htmlMin({
+			collapseWhitespace: true,
+			removeComments: true
+		})
+		)
+		// .pipe(gulpif(flags.prod,
+		// 	htmlMin({
+		// 		collapseWhitespace: true,
+		// 		removeComments: true 
+		// 		})
+		// 	))
 		.pipe(gulpif(!flags.prod, sourcemaps.write()))
-		.pipe(gulpif(!flags.prod,dest(path.build.html )))
-		.pipe(gulpif(flags.prod,dest(path.prod.html )))
+		.pipe(gulpif(flags.prod, dest(path.build.html)))
+		.pipe(gulpif(flags.prod, dest(path.prod.html)))
 		.pipe(browsersync.stream())
 }
 
@@ -134,7 +149,7 @@ function style() {
 				cascade: true
 			})
 		)
-		.pipe(webpcss())
+		// .pipe(webpcss())
 		.pipe(gulpif(!flags.prod, sourcemaps.write()))
 		.pipe(gulpif(flags.prod, cssnano()))
 		.pipe(
@@ -143,41 +158,79 @@ function style() {
 			})
 		)
 		.pipe(gulpif(!flags.prod, sourcemaps.write()))
-		.pipe(gulpif(!flags.prod, dest(path.build.style )))
-		.pipe(gulpif(flags.prod, dest(path.prod.style )))
+		.pipe(gulpif(!flags.prod, dest(path.build.style)))
+		.pipe(gulpif(flags.prod, dest(path.prod.style)))
 		.pipe(browsersync.stream())
 }
 
 function js() {
 	return src(path.src.js)
-	.pipe(sourcemaps.init())
-	.pipe(plumber())
-	.pipe(rigger())//в конце инклудов не должно бюыть пробелов
-	.pipe(babel({
-		presets: [[
-			"@babel/env",
-			{
-				"debug": false,//отобразит поддерживаемы браузеры в терминале и список примененных плагинов для адаптации
-				"targets": [
-					'last 2 versions', 'not dead', '> 0.2%'
-					// "last 3 chrome versions","last 3 firefox versions","last 3 edge versions","last 3 ios versions"
-				]
-			}]],
-		plugins: [
-			"@babel/plugin-proposal-class-properties"
-		]
-	}))
-	.pipe(gulpif(flags.prod, uglify()))
-	.pipe(
-		rename({
-			extname: ".min.js"
-		})
-	)
-	.pipe(gulpif(!flags.prod, sourcemaps.write('.')))
-	.pipe(gulpif(!flags.prod, dest(path.build.js )))
-	.pipe(gulpif(flags.prod, dest(path.prod.js )))
-	.pipe(browsersync.stream())
+		.pipe(sourcemaps.init())
+		.pipe(plumber())
+		.pipe(rigger())//в конце инклудов не должно бюыть пробелов
+		.pipe(babel({
+			presets: [[
+				"@babel/env",
+				{
+					"debug": false,//отобразит поддерживаемы браузеры в терминале и список примененных плагинов для адаптации
+					"targets": [
+						'last 2 versions', 'not dead', '> 0.2%'
+						// "last 3 chrome versions","last 3 firefox versions","last 3 edge versions","last 3 ios versions"
+					]
+				}]],
+			plugins: [
+				"@babel/plugin-proposal-class-properties",
+				"@babel/plugin-transform-classes",
+
+			]
+		}))
+		.pipe(gulpif(flags.prod, uglify()))
+		.pipe(
+			rename({
+				extname: ".min.js"
+			})
+		)
+		.pipe(gulpif(!flags.prod, sourcemaps.write('.')))
+		.pipe(gulpif(!flags.prod, dest(path.build.js)))
+		.pipe(gulpif(flags.prod, dest(path.prod.js)))
+		.pipe(browsersync.stream())
 };
+
+const bundle = (done) => {
+	// return src(path.src.js)
+	src(path.build.js + 'script.min.js')
+		.pipe(webpack({
+			mode: 'production',
+			output: {
+				filename: 'main.min.js'
+			},
+			watch: false,
+			devtool: "source-map",
+			module: {
+				rules: [
+					{
+						test: /\.js$/,
+						exclude: /(node_modules|bower_components)/,
+						use: {
+							loader: 'babel-loader',
+							options: {
+								presets: [['@babel/preset-env', {
+									debug: true,
+									corejs: 3,
+									useBuiltIns: "usage"
+								}]]
+							}
+						}
+					}
+				]
+			}
+		}))
+		.pipe(dest(path.build.js))
+		// .pipe(gulpif(!flags.prod, dest(path.build.js)))
+		// .pipe(gulpif(flags.prod, dest(path.prod.js)))
+		// .on("end", browsersync.reload);
+};
+
 
 function images() {
 	return src(path.src.img)
@@ -192,7 +245,7 @@ function images() {
 			imagemin({
 				progressive: true,
 				interlaced: true,
-				svgoPlugins: [{ removeViewBox: true }],
+				// svgoPlugins: [{ removeViewBox: true }],
 				optimizationLevel: 5 //от 0 до 7
 			})
 		)
@@ -203,10 +256,12 @@ function images() {
 function fonts() {
 	src(path.src.fonts)
 		.pipe(ttf2woff())
-		.pipe(dest(path.build.fonts))
+		.pipe(gulpif(!flags.prod, dest(path.build.fonts)))
+		.pipe(gulpif(flags.prod, dest(path.prod.fonts)))
 	return src(path.src.fonts)
 		.pipe(ttf2woff2())
-		.pipe(dest(path.build.fonts))
+		.pipe(gulpif(!flags.prod, dest(path.build.fonts)))
+		.pipe(gulpif(flags.prod, dest(path.prod.fonts)))
 }
 
 gulp.task('otf2ttf', function () {
@@ -245,10 +300,10 @@ function clean_prod() {
 	return del(path.clean_prod);
 };
 function otherProd() {
-	return src(path.build.fonts +  "/**/*.*")
-	.pipe(dest(path.prod.fonts))
-	.pipe(src(path.build.img + "/**/*.*"))
-	.pipe(dest(path.prod.img));
+	return src(path.build.fonts + "/**/*.*")
+		.pipe(dest(path.prod.fonts))
+		.pipe(src(path.build.img + "/**/*.*"))
+		.pipe(dest(path.prod.img));
 
 }
 
@@ -256,7 +311,7 @@ const build = gulp.series(clean, gulp.parallel(js, style, html, images, fonts));
 
 const build_prod = gulp.series(flagProd, clean_prod, gulp.parallel(js, style, html, images, fonts), otherProd);
 
-const watch = gulp.parallel(build, watchFile, browserSync);
+const watch = gulp.series(build, gulp.parallel(watchFile, browserSync));
 
 exports.fonts = fonts;
 exports.images = images;
