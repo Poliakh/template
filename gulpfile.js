@@ -76,7 +76,7 @@ const { src, dest } = require('gulp'),
 	plumber = require('gulp-plumber'),
 	// strip = require('gulp-strip-comments'),//устанвить после создания условий для  prodaction
 	cssnano = require('gulp-cssnano'),
-	gulpif = require('gulp-if');
+	gulpif = require('gulp-if'),
 	webpack = require("webpack-stream");
 
 
@@ -129,7 +129,7 @@ function html() {
 		// 		})
 		// 	))
 		.pipe(gulpif(!flags.prod, sourcemaps.write()))
-		.pipe(gulpif(flags.prod, dest(path.build.html)))
+		.pipe(gulpif(!flags.prod, dest(path.build.html)))
 		.pipe(gulpif(flags.prod, dest(path.prod.html)))
 		.pipe(browsersync.stream())
 }
