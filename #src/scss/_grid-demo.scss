@@ -42,9 +42,9 @@
 	border-radius: 50%;
 	border: none;
 	background-color: gray;
-	position: absolute;
+	position: fixed;
 	right: 20px;
-	top: 20px;
+	bottom: 20px;
 	opacity: 0.05;
 	transition: opacity 0.3s;
 	pointer-events: all;
