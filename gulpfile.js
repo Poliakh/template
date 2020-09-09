@@ -169,15 +169,18 @@ function js() {
 		.pipe(plumber())
 		.pipe(rigger())//в конце инклудов не должно бюыть пробелов
 		.pipe(babel({
-			presets: [[
-				"@babel/env",
-				{
-					"debug": false,//отобразит поддерживаемы браузеры в терминале и список примененных плагинов для адаптации
-					"targets": [
-						'last 2 versions', 'not dead', '> 0.2%'
-						// "last 3 chrome versions","last 3 firefox versions","last 3 edge versions","last 3 ios versions"
-					]
-				}]],
+			presets: [
+				[
+					"@babel/env",
+					{
+						"debug": false,//отобразит поддерживаемы браузеры в терминале и список примененных плагинов для адаптации
+						"targets": [
+							'last 2 versions', 'not dead', '> 0.2%'
+							// "last 3 chrome versions","last 3 firefox versions","last 3 edge versions","last 3 ios versions"
+						]
+					}
+				]
+			],
 			plugins: [
 				"@babel/plugin-proposal-class-properties",
 				"@babel/plugin-transform-classes",
@@ -198,9 +201,9 @@ function js() {
 
 const bundle = (done) => {
 	// return src(path.src.js)
-	src(path.build.js + 'script.min.js')
+	return src(path.src.js)
 		.pipe(webpack({
-			mode: 'production',
+			mode: 'development',
 			output: {
 				filename: 'main.min.js'
 			},
@@ -214,21 +217,35 @@ const bundle = (done) => {
 						use: {
 							loader: 'babel-loader',
 							options: {
-								presets: [['@babel/preset-env', {
-									debug: true,
-									corejs: 3,
-									useBuiltIns: "usage"
-								}]]
+								presets: [
+									['@babel/preset-env',
+										{
+											debug: true,
+											corejs: 3,
+											useBuiltIns: "usage"
+											// , "targets": [
+											// 	'last 2 versions', 'not dead', '> 0.2%'
+
+											// ]
+
+										}
+									]
+								],
+								plugins: [
+									'@babel/plugin-proposal-class-properties'
+								]
 							}
 						}
 					}
 				]
 			}
 		}))
-		.pipe(dest(path.build.js))
-		// .pipe(gulpif(!flags.prod, dest(path.build.js)))
-		// .pipe(gulpif(flags.prod, dest(path.prod.js)))
-		// .on("end", browsersync.reload);
+		// .pipe(dest(path.build.js))
+	.pipe(gulpif(!flags.prod, dest(path.build.js)))
+	.pipe(gulpif(flags.prod, dest(path.prod.js)))
+	.pipe(browsersync.stream())
+
+	// .on("end", browsersync.reload);
 };
 
 
@@ -289,7 +306,7 @@ gulp.task('svgSprite', function () {
 function watchFile() {
 	gulp.watch([path.watch.html], html);
 	gulp.watch([path.watch.scss], style);
-	gulp.watch([path.watch.js], js);
+	gulp.watch([path.watch.js], bundle);
 	gulp.watch([path.watch.img], images);
 };
 
@@ -307,15 +324,16 @@ function otherProd() {
 
 }
 
-const build = gulp.series(clean, gulp.parallel(js, style, html, images, fonts));
+const build = gulp.series(clean, gulp.parallel(bundle, style, html, images, fonts));
 
-const build_prod = gulp.series(flagProd, clean_prod, gulp.parallel(js, style, html, images, fonts), otherProd);
+const build_prod = gulp.series(flagProd, clean_prod, gulp.parallel(bundle, style, html, images, fonts), otherProd);
 
 const watch = gulp.series(build, gulp.parallel(watchFile, browserSync));
 
 exports.fonts = fonts;
 exports.images = images;
 exports.js = js;
+exports.bundle = bundle;
 exports.scss = style;
 exports.html = html;
 exports.build = build;
