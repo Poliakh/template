@@ -24,7 +24,7 @@ const path = {
 		src: source_folder + "/",
 		html: [source_folder + "/*.html", "!" + source_folder + "/_*.html"],
 		components: source_folder + "/components/",
-		js: source_folder + "/script/script.js",//В стилях и скриптах нам понадобятся только main файлы
+		js: source_folder + "/script/",///script.js",//В стилях и скриптах нам понадобятся только main файлы
 		scss: source_folder + "/scss/style.scss",
 		css: source_folder + "/css/**/*.css",
 		img: source_folder + "/images/**/*.{jpg,png,svg,gif,ico,webp}", //Синтаксис img/**/*.* означает - взять все файлы всех расширений из папки и из вложенных каталогов
@@ -77,7 +77,8 @@ const { src, dest } = require('gulp'),
 	// strip = require('gulp-strip-comments'),//устанвить после создания условий для  prodaction
 	cssnano = require('gulp-cssnano'),
 	gulpif = require('gulp-if'),
-	webpack = require("webpack-stream");
+	webpack = require("webpack-stream"),
+	CopyPlugin = require('copy-webpack-plugin');
 
 
 const flags = {
@@ -88,6 +89,9 @@ async function flagProd() {
 	flags.prod = true;
 };
 
+const mode = () => {
+	return(flags.prod)? "production" :"development";
+};
 
 function browserSync() {
 	browsersync.init({
@@ -201,9 +205,9 @@ function js() {
 
 const bundle = (done) => {
 	// return src(path.src.js)
-	return src(path.src.js)
+	return src(path.src.js + 'script.js')
 		.pipe(webpack({
-			mode: 'development',
+			mode: mode(),
 			output: {
 				filename: 'main.min.js'
 			},
@@ -222,11 +226,11 @@ const bundle = (done) => {
 										{
 											debug: true,
 											corejs: 3,
-											useBuiltIns: "usage"
-											// , "targets": [
-											// 	'last 2 versions', 'not dead', '> 0.2%'
+											useBuiltIns: "usage",
+											targets: [
+												'last 2 versions', 'not dead', '> 0.2%'
 
-											// ]
+											]
 
 										}
 									]
@@ -238,12 +242,22 @@ const bundle = (done) => {
 						}
 					}
 				]
+				
 			}
+			// ,plugins: [
+			// 	new CopyPlugin({
+			// 		patterns: [
+			// 			// { from: './'+source_folder+'/manifest.json', to:'../manifest.json' },
+			// 			// { from: './'+source_folder+'/sw-toolbox.js', to:'../sw-toolbox.js' },
+			// 			// { from: './'+source_folder+'/sw.js', to:'../sw.js' },
+			// 		],
+			// 	}),
+			// ]
 		}))
 		// .pipe(dest(path.build.js))
-	.pipe(gulpif(!flags.prod, dest(path.build.js)))
-	.pipe(gulpif(flags.prod, dest(path.prod.js)))
-	.pipe(browsersync.stream())
+		.pipe(gulpif(!flags.prod, dest(path.build.js)))
+		.pipe(gulpif(flags.prod, dest(path.prod.js)))
+		.pipe(browsersync.stream())
 
 	// .on("end", browsersync.reload);
 };

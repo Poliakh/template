@@ -7,3 +7,5 @@
 
 console.log("Hello World");
 
+import {addGrids} from './plugins/grids';
+addGrids()
