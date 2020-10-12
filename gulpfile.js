@@ -27,7 +27,8 @@ const path = {
 		js: source_folder + "/script/",///script.js",//В стилях и скриптах нам понадобятся только main файлы
 		scss: source_folder + "/scss/style.scss",
 		css: source_folder + "/css/**/*.css",
-		img: source_folder + "/images/**/*.{jpg,png,svg,gif,ico,webp}", //Синтаксис img/**/*.* означает - взять все файлы всех расширений из папки и из вложенных каталогов
+		sprite: source_folder + "/images/**/*.svg", //Синтаксис img/**/*.* означает - взять все файлы всех расширений из папки и из вложенных каталогов
+		img: source_folder + "/images/**/*.{jpg,png,gif,ico,webp}", //Синтаксис img/**/*.* означает - взять все файлы всех расширений из папки и из вложенных каталогов
 		fonts: source_folder + "/fonts/**/*.*"//"/fonts/**/*.ttf"
 
 	},
@@ -90,7 +91,7 @@ async function flagProd() {
 };
 
 const mode = () => {
-	return(flags.prod)? "production" :"development";
+	return (flags.prod) ? "production" : "development";
 };
 
 function browserSync() {
@@ -181,7 +182,9 @@ function js() {
 						"targets": [
 							'last 2 versions', 'not dead', '> 0.2%'
 							// "last 3 chrome versions","last 3 firefox versions","last 3 edge versions","last 3 ios versions"
-						]
+						],
+						useBuiltIns: 'usage',
+						corejs: 3
 					}
 				]
 			],
@@ -242,7 +245,7 @@ const bundle = (done) => {
 						}
 					}
 				]
-				
+
 			}
 			// ,plugins: [
 			// 	new CopyPlugin({
@@ -264,14 +267,14 @@ const bundle = (done) => {
 
 
 function images() {
-	return src(path.src.img)
-		.pipe(
-			webp({
-				quality: 70
-			})
-		)
-		.pipe(dest(path.build.img))
-		.pipe(src(path.src.img))
+	src(path.src.img)
+		// .pipe(
+		// 	webp({
+		// 		quality: 70
+		// 	})
+		// )
+		// .pipe(dest(path.build.img))
+		// .pipe(src(path.src.img))
 		.pipe(
 			imagemin({
 				progressive: true,
@@ -281,7 +284,10 @@ function images() {
 			})
 		)
 		.pipe(dest(path.build.img))
+	return src(path.src.sprite)
+		.pipe(dest(path.build.img))
 		.pipe(browsersync.stream())
+
 }
 
 function fonts() {
@@ -304,7 +310,7 @@ gulp.task('otf2ttf', function () {
 })
 
 gulp.task('svgSprite', function () {
-	return gulp.src([source_folder + '/iconsprite/*.svg'])
+	return gulp.src([source_folder + '/images/*.svg'])
 		.pipe(svgSprite({
 			mode: {
 				stack: {
