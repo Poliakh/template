@@ -24,10 +24,11 @@ const path = {
 		src: source_folder + "/",
 		html: [source_folder + "/*.html", "!" + source_folder + "/_*.html"],
 		components: source_folder + "/components/",
-		js: source_folder + "/script/script.js",//В стилях и скриптах нам понадобятся только main файлы
+		js: source_folder + "/script/",///script.js",//В стилях и скриптах нам понадобятся только main файлы
 		scss: source_folder + "/scss/style.scss",
 		css: source_folder + "/css/**/*.css",
-		img: source_folder + "/images/**/*.{jpg,png,svg,gif,ico,webp}", //Синтаксис img/**/*.* означает - взять все файлы всех расширений из папки и из вложенных каталогов
+		sprite: source_folder + "/images/**/*.svg", //Синтаксис img/**/*.* означает - взять все файлы всех расширений из папки и из вложенных каталогов
+		img: source_folder + "/images/**/*.{jpg,png,gif,ico,webp}", //Синтаксис img/**/*.* означает - взять все файлы всех расширений из папки и из вложенных каталогов
 		fonts: source_folder + "/fonts/**/*.*"//"/fonts/**/*.ttf"
 
 	},
@@ -77,7 +78,8 @@ const { src, dest } = require('gulp'),
 	// strip = require('gulp-strip-comments'),//устанвить после создания условий для  prodaction
 	cssnano = require('gulp-cssnano'),
 	gulpif = require('gulp-if'),
-	webpack = require("webpack-stream");
+	webpack = require("webpack-stream"),
+	CopyPlugin = require('copy-webpack-plugin');
 
 
 const flags = {
@@ -88,6 +90,9 @@ async function flagProd() {
 	flags.prod = true;
 };
 
+const mode = () => {
+	return (flags.prod) ? "production" : "development";
+};
 
 function browserSync() {
 	browsersync.init({
@@ -163,44 +168,11 @@ function style() {
 		.pipe(browsersync.stream())
 }
 
-function js() {
-	return src(path.src.js)
-		.pipe(sourcemaps.init())
-		.pipe(plumber())
-		.pipe(rigger())//в конце инклудов не должно бюыть пробелов
-		.pipe(babel({
-			presets: [[
-				"@babel/env",
-				{
-					"debug": false,//отобразит поддерживаемы браузеры в терминале и список примененных плагинов для адаптации
-					"targets": [
-						'last 2 versions', 'not dead', '> 0.2%'
-						// "last 3 chrome versions","last 3 firefox versions","last 3 edge versions","last 3 ios versions"
-					]
-				}]],
-			plugins: [
-				"@babel/plugin-proposal-class-properties",
-				"@babel/plugin-transform-classes",
-
-			]
-		}))
-		.pipe(gulpif(flags.prod, uglify()))
-		.pipe(
-			rename({
-				extname: ".min.js"
-			})
-		)
-		.pipe(gulpif(!flags.prod, sourcemaps.write('.')))
-		.pipe(gulpif(!flags.prod, dest(path.build.js)))
-		.pipe(gulpif(flags.prod, dest(path.prod.js)))
-		.pipe(browsersync.stream())
-};
-
 const bundle = (done) => {
 	// return src(path.src.js)
-	src(path.build.js + 'script.min.js')
+	return src(path.src.js + 'script.js')
 		.pipe(webpack({
-			mode: 'production',
+			mode: mode(),
 			output: {
 				filename: 'main.min.js'
 			},
@@ -214,33 +186,60 @@ const bundle = (done) => {
 						use: {
 							loader: 'babel-loader',
 							options: {
-								presets: [['@babel/preset-env', {
-									debug: true,
-									corejs: 3,
-									useBuiltIns: "usage"
-								}]]
+								presets: [
+									['@babel/preset-env',
+										{
+											debug: true,
+											corejs: 3,
+											useBuiltIns: "usage",
+											targets: [
+												'last 2 versions', 'not dead', '> 0.2%'
+
+											]
+
+										}
+									]
+								],
+								plugins: [
+									'@babel/plugin-proposal-class-properties'
+								]
 							}
 						}
-					}
+					}, {
+						test: /\.css$/i,
+						use: ['style-loader', 'css-loader'],
+					},
 				]
+
 			}
+			// ,plugins: [
+			// 	new CopyPlugin({
+			// 		patterns: [
+			// 			// { from: './'+source_folder+'/manifest.json', to:'../manifest.json' },
+			// 			// { from: './'+source_folder+'/sw-toolbox.js', to:'../sw-toolbox.js' },
+			// 			// { from: './'+source_folder+'/sw.js', to:'../sw.js' },
+			// 		],
+			// 	}),
+			// ]
 		}))
-		.pipe(dest(path.build.js))
-		// .pipe(gulpif(!flags.prod, dest(path.build.js)))
-		// .pipe(gulpif(flags.prod, dest(path.prod.js)))
-		// .on("end", browsersync.reload);
+		// .pipe(dest(path.build.js))
+		.pipe(gulpif(!flags.prod, dest(path.build.js)))
+		.pipe(gulpif(flags.prod, dest(path.prod.js)))
+		.pipe(browsersync.stream())
+
+	// .on("end", browsersync.reload);
 };
 
 
 function images() {
-	return src(path.src.img)
-		.pipe(
-			webp({
-				quality: 70
-			})
-		)
-		.pipe(dest(path.build.img))
-		.pipe(src(path.src.img))
+	src(path.src.img)
+		// .pipe(
+		// 	webp({
+		// 		quality: 70
+		// 	})
+		// )
+		// .pipe(dest(path.build.img))
+		// .pipe(src(path.src.img))
 		.pipe(
 			imagemin({
 				progressive: true,
@@ -250,7 +249,10 @@ function images() {
 			})
 		)
 		.pipe(dest(path.build.img))
+	return src(path.src.sprite)
+		.pipe(dest(path.build.img))
 		.pipe(browsersync.stream())
+
 }
 
 function fonts() {
@@ -273,7 +275,7 @@ gulp.task('otf2ttf', function () {
 })
 
 gulp.task('svgSprite', function () {
-	return gulp.src([source_folder + '/iconsprite/*.svg'])
+	return gulp.src([source_folder + '/images/*.svg'])
 		.pipe(svgSprite({
 			mode: {
 				stack: {
@@ -289,7 +291,7 @@ gulp.task('svgSprite', function () {
 function watchFile() {
 	gulp.watch([path.watch.html], html);
 	gulp.watch([path.watch.scss], style);
-	gulp.watch([path.watch.js], js);
+	gulp.watch([path.watch.js], bundle);
 	gulp.watch([path.watch.img], images);
 };
 
@@ -307,15 +309,15 @@ function otherProd() {
 
 }
 
-const build = gulp.series(clean, gulp.parallel(js, style, html, images, fonts));
+const build = gulp.series(clean, gulp.parallel(bundle, style, html, images, fonts));
 
-const build_prod = gulp.series(flagProd, clean_prod, gulp.parallel(js, style, html, images, fonts), otherProd);
+const build_prod = gulp.series(flagProd, clean_prod, gulp.parallel(bundle, style, html, images, fonts), otherProd);
 
 const watch = gulp.series(build, gulp.parallel(watchFile, browserSync));
 
 exports.fonts = fonts;
 exports.images = images;
-exports.js = js;
+exports.bundle = bundle;
 exports.scss = style;
 exports.html = html;
 exports.build = build;
