@@ -52,12 +52,11 @@
 	&:after {
 		display: block;
 		content: "⌗";
-		width: 20px;
-		height: 20px;
 		color: white;
-		margin: 0 auto;
-		line-height: 24px;
+		line-height: 0;
 		transition: color .3s;
+		font-size: 15px;
+		line-height: 15px;
 	}
 	&:hover {
 		opacity: 0.8;
