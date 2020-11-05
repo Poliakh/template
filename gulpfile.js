@@ -259,11 +259,9 @@ function images() {
 }
 
 function fonts() {
-	src(path.src.fonts)
-		.pipe(ttf2woff())
-		.pipe(gulpif(!flags.prod, dest(path.build.fonts)))
-		.pipe(gulpif(flags.prod, dest(path.prod.fonts)))
 	return src(path.src.fonts)
+		.pipe(ttf2woff())
+		.pipe(src(path.src.fonts))
 		.pipe(ttf2woff2())
 		.pipe(gulpif(!flags.prod, dest(path.build.fonts)))
 		.pipe(gulpif(flags.prod, dest(path.prod.fonts)))

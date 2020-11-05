@@ -40,12 +40,13 @@
     "sass-loader": "^10.0.5",
     "style-loader": "^2.0.0",
     "webpack": "^5.4.0",
-	"python": "0.0.4"
+    "python": "0.0.4"
   },
   "dependencies": {
     "babel-loader": "^8.1.0",
-    "css-vars-ponyfill": "^2.3.2",
     "core-js": "^3.6.5",
+    "css-vars-ponyfill": "^2.3.2",
+    "reset-css": "^5.0.1",
     "svgxuse": "^1.2.6",
     "webpack-stream": "^5.2.1"
   }
