@@ -1,5 +1,5 @@
 /*
- -------------- для запуска версии prodaction-----------------
+ -------------- для запуска версии production-----------------
 	gulp build - обычная сборка в папку  build
 	gulp prod - сжатая версия в папке prodгction
 	gulp - дефолтный запуск с вотчером
@@ -24,13 +24,12 @@ const path = {
 		src: source_folder + "/",
 		html: [source_folder + "/*.html", "!" + source_folder + "/_*.html"],
 		components: source_folder + "/components/",
-		js: source_folder + "/script/",///script.js",//В стилях и скриптах нам понадобятся только main файлы
+		js: source_folder + "/script/",
 		scss: source_folder + "/scss/style.scss",
 		css: source_folder + "/css/**/*.css",
-		sprite: source_folder + "/images/**/*.svg", //Синтаксис img/**/*.* означает - взять все файлы всех расширений из папки и из вложенных каталогов
-		img: source_folder + "/images/**/*.{jpg,png,gif,ico,webp}", //Синтаксис img/**/*.* означает - взять все файлы всех расширений из папки и из вложенных каталогов
+		sprite: source_folder + "/images/**/*.svg",
+		img: source_folder + "/images/**/*.{jpg,png,gif,ico,webp}",
 		fonts: source_folder + "/fonts/**/*.*"//"/fonts/**/*.ttf"
-
 	},
 	watch: {
 		html: source_folder + "/**/*.html",
@@ -64,8 +63,6 @@ const { src, dest } = require('gulp'),
 	autoprefixer = require('gulp-autoprefixer'),
 	group_media = require('gulp-group-css-media-queries'),
 	rename = require('gulp-rename'),
-	uglify = require('gulp-uglify-es').default,
-	babel = require('gulp-babel'),
 	imagemin = require('gulp-imagemin'),
 	webp = require('gulp-webp'),
 	webp_html = require('gulp-webp-html'),
@@ -168,8 +165,7 @@ function style() {
 		.pipe(browsersync.stream())
 }
 
-const bundle = (done) => {
-	// return src(path.src.js)
+const bundle = () => {
 	return src(path.src.js + 'script.js')
 		.pipe(webpack({
 			mode: mode(),
@@ -189,28 +185,33 @@ const bundle = (done) => {
 								presets: [
 									['@babel/preset-env',
 										{
-											debug: true,
+											debug: false,
 											corejs: 3,
 											useBuiltIns: "usage",
 											targets: [
 												'last 2 versions', 'not dead', '> 0.2%'
-
 											]
-
 										}
 									]
 								],
 								plugins: [
 									'@babel/plugin-proposal-class-properties'
-								]
+								],
+								cacheDirectory: true
 							}
 						}
 					}, {
-						test: /\.css$/i,
-						use: ['style-loader', 'css-loader'],
-					},
+						test: /\.s[ac]ss$/i,
+						use: [
+						  // Creates `style` nodes from JS strings
+						  'style-loader',
+						  // Translates CSS into CommonJS
+						  'css-loader',
+						  // Compiles Sass to CSS
+						  'sass-loader',
+						],
+					  },
 				]
-
 			}
 			// ,plugins: [
 			// 	new CopyPlugin({
@@ -248,11 +249,13 @@ function images() {
 				optimizationLevel: 5 //от 0 до 7
 			})
 		)
-		.pipe(dest(path.build.img))
-	return src(path.src.sprite)
-		.pipe(dest(path.build.img))
-		.pipe(browsersync.stream())
+		.pipe(gulpif(!flags.prod, dest(path.build.img)))
+		.pipe(gulpif(flags.prod, dest(path.prod.img)))
 
+	return src(path.src.sprite)
+		.pipe(gulpif(!flags.prod, dest(path.build.img)))
+		.pipe(gulpif(flags.prod, dest(path.prod.img)))
+		.pipe(browsersync.stream())
 }
 
 function fonts() {
@@ -302,11 +305,8 @@ function clean_prod() {
 	return del(path.clean_prod);
 };
 function otherProd() {
-	return src(path.build.fonts + "/**/*.*")
-		.pipe(dest(path.prod.fonts))
-		.pipe(src(path.build.img + "/**/*.*"))
-		.pipe(dest(path.prod.img));
-
+	// return src(path.build.fonts + "/**/*.*")
+	// 	.pipe(dest(path.prod.fonts))
 }
 
 const build = gulp.series(clean, gulp.parallel(bundle, style, html, images, fonts));
