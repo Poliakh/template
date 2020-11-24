@@ -2,24 +2,26 @@
 
 const grids =
 	`<button class="gridOn"></button>
-<div id="grid" class="wrapGrid container">
-	<div class="grid ">
-		<div class="col"></div>
-		<div class="col"></div>
-		<div class="col"></div>
-		<div class="col"></div>
-		<div class="col"></div>
-		<div class="col"></div>
-		<div class="col"></div>
-		<div class="col"></div>
-		<div class="col"></div>
-		<div class="col"></div>
-		<div class="col"></div>
-		<div class="col"></div>
+<div id="grid" class="wrapGrid">
+	<div class="container">
+		<div class="grid ">
+			<div class="col"></div>
+			<div class="col"></div>
+			<div class="col"></div>
+			<div class="col"></div>
+			<div class="col"></div>
+			<div class="col"></div>
+			<div class="col"></div>
+			<div class="col"></div>
+			<div class="col"></div>
+			<div class="col"></div>
+			<div class="col"></div>
+			<div class="col"></div>
+		</div>
 	</div>
 </div>`;
 
-document.body.insertAdjacentHTML('afterend', grids);
+document.body.insertAdjacentHTML('beforeend', grids);
 
 const onGrid = () => {
 	console.log(grid);
