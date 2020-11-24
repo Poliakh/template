@@ -101,12 +101,6 @@ function html() {
 		.pipe(plumber())
 		.pipe(rigger())
 		// .pipe(webp_html())
-		// .pipe(gulpif(argv.prod,
-		// 	htmlMin({
-		// 		collapseWhitespace: true,
-		// 		removeComments: true 
-		// 		})
-		// 	))
 		.pipe(gulpif(flags.prod,
 			htmlMin({
 				collapseWhitespace: true,
@@ -114,8 +108,7 @@ function html() {
 				})
 			))
 		.pipe(gulpif(!flags.prod, sourcemaps.write()))
-		.pipe(gulpif(!flags.prod,dest(path.build.html )))
-		.pipe(gulpif(flags.prod,dest(path.prod.html )))
+		.pipe(gulpif(flags.prod, dest(path.prod.html ), dest(path.build.html )))
 		.pipe(browsersync.stream())
 }
 
@@ -134,17 +127,15 @@ function style() {
 				cascade: true
 			})
 		)
-		.pipe(webpcss())
-		.pipe(gulpif(!flags.prod, sourcemaps.write()))
+		// .pipe(webpcss())
 		.pipe(gulpif(flags.prod, cssnano()))
 		.pipe(
 			rename({
 				extname: ".min.css"
 			})
 		)
-		.pipe(gulpif(!flags.prod, sourcemaps.write()))
-		.pipe(gulpif(!flags.prod, dest(path.build.style )))
-		.pipe(gulpif(flags.prod, dest(path.prod.style )))
+		.pipe(gulpif(!flags.prod, sourcemaps.write('.')))
+		.pipe(gulpif(flags.prod, dest(path.prod.style ) , dest(path.build.style )))
 		.pipe(browsersync.stream())
 }
 
@@ -174,8 +165,7 @@ function js() {
 		})
 	)
 	.pipe(gulpif(!flags.prod, sourcemaps.write('.')))
-	.pipe(gulpif(!flags.prod, dest(path.build.js )))
-	.pipe(gulpif(flags.prod, dest(path.prod.js )))
+	.pipe(gulpif(flags.prod, dest(path.prod.js ), dest(path.build.js )))
 	.pipe(browsersync.stream())
 };
 
@@ -196,17 +186,17 @@ function images() {
 				optimizationLevel: 5 //от 0 до 7
 			})
 		)
-		.pipe(dest(path.build.img))
+		.pipe(gulpif(flags.prod, dest(path.prod.img), dest(path.build.img)))
 		.pipe(browsersync.stream())
 }
 
 function fonts() {
 	src(path.src.fonts)
 		.pipe(ttf2woff())
-		.pipe(dest(path.build.fonts))
+		.pipe(gulpif(flags.prod, dest(path.prod.fonts), dest(path.build.fonts)))
 	return src(path.src.fonts)
 		.pipe(ttf2woff2())
-		.pipe(dest(path.build.fonts))
+		.pipe(gulpif(flags.prod, dest(path.prod.fonts), dest(path.build.fonts)))
 }
 
 gulp.task('otf2ttf', function () {
@@ -245,16 +235,16 @@ function clean_prod() {
 	return del(path.clean_prod);
 };
 function otherProd() {
-	return src(path.build.fonts +  "/**/*.*")
-	.pipe(dest(path.prod.fonts))
-	.pipe(src(path.build.img + "/**/*.*"))
-	.pipe(dest(path.prod.img));
+	// return src(path.build.fonts +  "/**/*.*")
+	// .pipe(dest(path.prod.fonts))
+	// .pipe(src(path.build.img + "/**/*.*"))
+	// .pipe(dest(path.prod.img));
 
 }
 
 const build = gulp.series(clean, gulp.parallel(js, style, html, images, fonts));
 
-const build_prod = gulp.series(flagProd, clean_prod, gulp.parallel(js, style, html, images, fonts), otherProd);
+const build_prod = gulp.series(flagProd, clean_prod, gulp.parallel(js, style, html, images, fonts));
 
 const watch = gulp.parallel(build, watchFile, browserSync);
 

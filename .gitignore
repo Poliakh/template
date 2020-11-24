@@ -1,3 +1,4 @@
 # игнорироем файл сборки и модули npm
 build/
 node_modules/
+production/
