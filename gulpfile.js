@@ -263,8 +263,7 @@ function fonts() {
 		.pipe(ttf2woff())
 		.pipe(src(path.src.fonts))
 		.pipe(ttf2woff2())
-		.pipe(gulpif(!flags.prod, dest(path.build.fonts)))
-		.pipe(gulpif(flags.prod, dest(path.prod.fonts)))
+		.pipe(gulpif(flags.prod, dest(path.prod.fonts), dest(path.build.fonts)))
 }
 
 gulp.task('otf2ttf', function () {
