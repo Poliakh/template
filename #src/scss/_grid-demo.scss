@@ -1,4 +1,3 @@
-
 .grid {
 	background-color: rgba(255, 0, 0, 0.1);
 	// position: absolute;
@@ -30,8 +29,8 @@
 .col {
 	background-color: rgba(0, 128, 0, 0.1);
 	min-height: 100%;
-	margin: 0 var(--ofs);
-	width: calc(100% / 12 - var(--ofs) * 2);
+	margin: 0 $ofs;
+	width: $col-12;
 	display: grid;
 	place-items: center;
 }
@@ -42,9 +41,9 @@
 	border-radius: 50%;
 	border: none;
 	background-color: gray;
-	position: absolute;
+	position: fixed;
 	right: 20px;
-	top: 20px;
+	bottom: 20px;
 	opacity: 0.05;
 	transition: opacity 0.3s;
 	pointer-events: all;
@@ -53,7 +52,8 @@
 		display: block;
 		content: "⌗";
 		color: white;
-		line-height: 0;
+		margin: 0 auto;
+		line-height: 20px;
 		transition: color .3s;
 		font-size: 15px;
 		line-height: 15px;
@@ -88,26 +88,26 @@
 .content6 {
 	background-color: rgba(0, 0, 255, 0.4);
 	height: 50px;
-	width: var(--col-1);
-	margin: 0 var(--ofs);
+	width: $col-1;
+	margin: 0 $ofs;
 	margin-top: 30px;
 	box-sizing: border-box;
 }
 .content2 {
-	width: var(--col-2);
+	width: $col-2;
 }
 
 .content3 {
-	width: var(--col-3);
+	width: $col-3;
 }
 .content4 {
-	width: var(--col-4);
+	width: $col-4;
 }
 .content5 {
-	width: var(--col-5);
+	width: $col-5;
 }
 .content6 {
-	width: var(--col-6);
+	width: $col-6;
 }
 // .content5 {
 // 	width: var(--col-5);
