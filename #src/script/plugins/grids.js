@@ -2,7 +2,7 @@
 
 export default () => {
 	const grids =
-	`<button class="gridOn"></button>
+		`<button class="gridOn"></button>
 	<div id="grid" class="wrapGrid">
 		<div class="container">
 			<div class="grid ">
@@ -41,6 +41,7 @@ export default () => {
 	document.querySelector('.gridOn').addEventListener('click', onGrid);
 
 
-if (localStorage.grids === 'on'){
-	grid.classList.add('vis')
-};
+	if (localStorage.grids === 'on') {
+		grid.classList.add('vis')
+	};
+}

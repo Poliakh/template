@@ -109,7 +109,6 @@ function browserSync() {
 
 function html() {
 	return src(path.src.html)
-		.pipe(sourcemaps.init())
 		.pipe(plumber())
 		.pipe(rigger())
 		// .pipe(webp_html())
@@ -118,8 +117,8 @@ function html() {
 				collapseWhitespace: true,
 				removeComments: true 
 				})
-			), sourcemaps.write())
-		.pipe(gulpif(flags.prod, dest(path.prod.html ), dest(path.build.html )))
+			))
+		.pipe(gulpif(flags.prod, dest( path.prod.html ), dest( path.build.html )))
 		.pipe(browsersync.stream())
 }
 
@@ -156,8 +155,8 @@ const bundle = () => {
 			output: {
 				filename: 'main.min.js'
 			},
-			watch: true,
-			devtool: "source-map",
+			watch: false,
+			devtool: flags.prod? '': 'source-map',
 			module: {
 				rules: [
 					{
@@ -173,7 +172,7 @@ const bundle = () => {
 											corejs: 3,
 											useBuiltIns: "usage",
 											targets: [
-												'last 2 versions', 'not dead', '> 0.2%'
+												'last 2 versions', 'not dead', '> 0.2%',
 											]
 										}
 									]
@@ -260,7 +259,7 @@ gulp.task('svgSprite', function () {
 function watchFile() {
 	gulp.watch([path.watch.html], html);
 	gulp.watch([path.watch.scss], style);
-	// gulp.watch([path.watch.js], bundle);
+	gulp.watch([path.watch.js], bundle);
 	gulp.watch([path.watch.img], images);
 };
 
