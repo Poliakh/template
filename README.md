@@ -1,4 +1,4 @@
-# [Инструкция](https://github.com/Poliakh/myhelp/blob/master/help.md)  
+# Инструкция  
 
 основан на [примере](https://www.youtube.com/watch?v=stFOy0Noahg)  
 `npm i` - установка модулей  
