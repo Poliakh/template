@@ -5,7 +5,7 @@
 	gulp - дефолтный запуск с вотчером
 ---------------------end-----------------------------------
 */
-const	project_folder	= "build",
+const	project_folder		= "build",
 		production_folder	= "production",
 		source_folder		= "#src";
 // const project_folder = require("path").basename(__dirname) // назовет конечную папку названием проекта.
@@ -22,12 +22,12 @@ const path = {
 		src: source_folder + "/",
 		html: [source_folder + "/*.html", "!" + source_folder + "/_*.html"],
 		components: source_folder + "/components/",
-		js: source_folder + "/script/script.js",//В стилях и скриптах нам понадобятся только main файлы
+		js: source_folder + "/script/",
 		scss: source_folder + "/scss/style.scss",
 		css: source_folder + "/css/**/*.css",
-		img: source_folder + "/images/**/*.{jpg,png,svg,gif,ico,webp}", //Синтаксис img/**/*.* означает - взять все файлы всех расширений из папки и из вложенных каталогов
+		svg: source_folder + "/images/**/*.svg",
+		img: source_folder + "/images/**/*.{jpg,png,gif,ico,webp}",
 		fonts: source_folder + "/fonts/**/*.*"//"/fonts/**/*.ttf"
-
 	},
 	watch: {
 		html: source_folder + "/**/*.html",
@@ -40,7 +40,7 @@ const path = {
 	},
 	clean: "./" + project_folder + "/",
 	clean_prod: "./" + production_folder + "/",
-	prod:{
+	prod: {
 		html: production_folder + "/",
 		js: production_folder + "/script/",
 		style: production_folder + "/css/",
@@ -106,8 +106,7 @@ function html() {
 				collapseWhitespace: true,
 				removeComments: true 
 				})
-			))
-		.pipe(gulpif(!flags.prod, sourcemaps.write()))
+			), sourcemaps.write())
 		.pipe(gulpif(flags.prod, dest(path.prod.html ), dest(path.build.html )))
 		.pipe(browsersync.stream())
 }
@@ -128,73 +127,101 @@ function style() {
 			})
 		)
 		// .pipe(webpcss())
-		.pipe(gulpif(flags.prod, cssnano()))
 		.pipe(
 			rename({
 				extname: ".min.css"
 			})
 		)
-		.pipe(gulpif(!flags.prod, sourcemaps.write('.')))
-		.pipe(gulpif(flags.prod, dest(path.prod.style ) , dest(path.build.style )))
+		.pipe(gulpif(flags.prod, cssnano(), sourcemaps.write('.')))
+		.pipe(gulpif(flags.prod, dest(path.prod.style ), dest(path.build.style )))
 		.pipe(browsersync.stream())
 }
 
-function js() {
-	return src(path.src.js)
-	.pipe(sourcemaps.init())
-	.pipe(plumber())
-	.pipe(rigger())//в конце инклудов не должно бюыть пробелов
-	.pipe(babel({
-		presets: [[
-			"@babel/env",
-			{
-				"debug": false,//отобразит поддерживаемы браузеры в терминале и список примененных плагинов для адаптации
-				"targets": [
-					'last 2 versions', 'not dead', '> 0.2%'
-					// "last 3 chrome versions","last 3 firefox versions","last 3 edge versions","last 3 ios versions"
+const bundle = () => {
+	return src(path.src.js + 'script.js')
+		.pipe(webpack({
+			mode: mode(),
+			output: {
+				filename: 'main.min.js'
+			},
+			watch: true,
+			devtool: "source-map",
+			module: {
+				rules: [
+					{
+						test: /\.js$/,
+						exclude: /(node_modules|bower_components)/,
+						use: {
+							loader: 'babel-loader',
+							options: {
+								presets: [
+									['@babel/preset-env',
+										{
+											debug: false,
+											corejs: 3,
+											useBuiltIns: "usage",
+											targets: [
+												'last 2 versions', 'not dead', '> 0.2%',
+											]
+
+										}
+									]
+								],
+								plugins: [
+									'@babel/plugin-proposal-class-properties'
+								],
+								cacheDirectory: true
+							}
+						}
+					},
+					 {
+						test: /\.s[ac]ss$/i,
+						use: [
+							'style-loader',
+							'css-loader',
+							'sass-loader',
+						  ],
+					}
 				]
-			}]],
-		plugins: [
-			"@babel/plugin-proposal-class-properties"
-		]
-	}))
-	.pipe(gulpif(flags.prod, uglify()))
-	.pipe(
-		rename({
-			extname: ".min.js"
-		})
-	)
-	.pipe(gulpif(!flags.prod, sourcemaps.write('.')))
-	.pipe(gulpif(flags.prod, dest(path.prod.js ), dest(path.build.js )))
-	.pipe(browsersync.stream())
+
+			}
+			// ,plugins: [
+			// 	new CopyPlugin({
+			// 		patterns: [
+			// 			// { from: './'+source_folder+'/manifest.json', to:'../manifest.json' },
+			// 			// { from: './'+source_folder+'/sw-toolbox.js', to:'../sw-toolbox.js' },
+			// 			// { from: './'+source_folder+'/sw.js', to:'../sw.js' },
+			// 		],
+			// 	}),
+			// ]
+		}))
+		.pipe(gulpif(flags.prod, dest(path.prod.js), dest(path.build.js)))
+		.pipe(browsersync.stream())
+	// .on("end", browsersync.reload);
 };
 
 function images() {
-	return src(path.src.img)
-		.pipe(
-			webp({
-				quality: 70
-			})
-		)
-		.pipe(dest(path.build.img))
-		.pipe(src(path.src.img))
+	src(path.src.img)
 		.pipe(
 			imagemin({
 				progressive: true,
 				interlaced: true,
-				svgoPlugins: [{ removeViewBox: true }],
+				// svgoPlugins: [{ removeViewBox: true }],
 				optimizationLevel: 5 //от 0 до 7
 			})
 		)
 		.pipe(gulpif(flags.prod, dest(path.prod.img), dest(path.build.img)))
+
+	return src(path.src.svg)
+		.pipe(gulpif(!flags.prod, dest(path.build.img)))
+		.pipe(gulpif(flags.prod, dest(path.prod.img)))
 		.pipe(browsersync.stream())
 }
 
 function fonts() {
-	src(path.src.fonts)
-		.pipe(ttf2woff())
-		.pipe(gulpif(flags.prod, dest(path.prod.fonts), dest(path.build.fonts)))
 	return src(path.src.fonts)
+		.pipe(ttf2woff())
+		.pipe(src(path.src.fonts))
 		.pipe(ttf2woff2())
 		.pipe(gulpif(flags.prod, dest(path.prod.fonts), dest(path.build.fonts)))
 }
@@ -224,7 +251,7 @@ gulp.task('svgSprite', function () {
 function watchFile() {
 	gulp.watch([path.watch.html], html);
 	gulp.watch([path.watch.scss], style);
-	gulp.watch([path.watch.js], js);
+	// gulp.watch([path.watch.js], bundle);
 	gulp.watch([path.watch.img], images);
 };
 
@@ -242,15 +269,15 @@ function otherProd() {
 
 }
 
-const build = gulp.series(clean, gulp.parallel(js, style, html, images, fonts));
+const build = gulp.series(clean, gulp.parallel(bundle, style, html, images, fonts));
 
-const build_prod = gulp.series(flagProd, clean_prod, gulp.parallel(js, style, html, images, fonts));
+const build_prod = gulp.series(flagProd, clean_prod, gulp.parallel(bundle, style, html, images, fonts));
 
 const watch = gulp.series(build, gulp.parallel(watchFile, browserSync));
 
 exports.fonts = fonts;
 exports.images = images;
-exports.js = js;
+exports.scripts = bundle;
 exports.scss = style;
 exports.html = html;
 exports.build = build;
