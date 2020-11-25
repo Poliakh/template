@@ -113,26 +113,14 @@ function html() {
 		.pipe(plumber())
 		.pipe(rigger())
 		// .pipe(webp_html())
-		// .pipe(gulpif(argv.prod,
-		// 	htmlMin({
-		// 		collapseWhitespace: true,
-		// 		removeComments: true 
-		// 		})
-		// 	))
-		.pipe(htmlMin({
-			collapseWhitespace: true,
-			removeComments: true
-		})
-		)
-		// .pipe(gulpif(flags.prod,
-		// 	htmlMin({
-		// 		collapseWhitespace: true,
-		// 		removeComments: true 
-		// 		})
-		// 	))
+		.pipe(gulpif(flags.prod,
+			htmlMin({
+				collapseWhitespace: true,
+				removeComments: true 
+				})
+			))
 		.pipe(gulpif(!flags.prod, sourcemaps.write()))
-		.pipe(gulpif(!flags.prod, dest(path.build.html)))
-		.pipe(gulpif(flags.prod, dest(path.prod.html)))
+		.pipe(gulpif(flags.prod, dest(path.prod.html ), dest(path.build.html )))
 		.pipe(browsersync.stream())
 }
 
@@ -159,9 +147,8 @@ function style() {
 				extname: ".min.css"
 			})
 		)
-		.pipe(gulpif(!flags.prod, sourcemaps.write()))
-		.pipe(gulpif(!flags.prod, dest(path.build.style)))
-		.pipe(gulpif(flags.prod, dest(path.prod.style)))
+		.pipe(gulpif(!flags.prod, sourcemaps.write('.')))
+		.pipe(gulpif(flags.prod, dest(path.prod.style ) , dest(path.build.style )))
 		.pipe(browsersync.stream())
 }
 
@@ -212,7 +199,6 @@ const bundle = () => {
 						],
 					  },
 				]
-
 			}
 			// ,plugins: [
 			// 	new CopyPlugin({
@@ -224,14 +210,10 @@ const bundle = () => {
 			// 	}),
 			// ]
 		}))
-		// .pipe(dest(path.build.js))
-		.pipe(gulpif(!flags.prod, dest(path.build.js)))
-		.pipe(gulpif(flags.prod, dest(path.prod.js)))
-		.pipe(browsersync.stream())
-
-	// .on("end", browsersync.reload);
+	.pipe(gulpif(flags.prod, dest(path.prod.js ), dest(path.build.js )))
+	.pipe(browsersync.stream())
+		// .on("end", browsersync.reload);
 };
-
 
 function images() {
 	src(path.src.img)
@@ -250,13 +232,10 @@ function images() {
 				optimizationLevel: 5 //от 0 до 7
 			})
 		)
-
-		.pipe(gulpif(!flags.prod, dest(path.build.img)))
-		.pipe(gulpif(flags.prod, dest(path.prod.img)))
-	return src(path.src.sprite)
-		.pipe(gulpif(!flags.prod, dest(path.build.img)))
-		.pipe(gulpif(flags.prod, dest(path.prod.img)))
-		.pipe(browsersync.stream())
+		.pipe(gulpif(flags.prod, dest(path.prod.img), dest(path.build.img)))
+ return src(path.src.sprite)
+		.pipe(gulpif(flags.prod, dest(path.prod.img), dest(path.build.img))))
+    .pipe(browsersync.stream())
 }
 
 function fonts() {
