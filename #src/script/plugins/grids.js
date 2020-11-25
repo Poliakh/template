@@ -22,25 +22,25 @@ export default () => {
 		</div>
 	</div>`;
 
-document.body.insertAdjacentHTML('beforeend', grids);
+	document.body.insertAdjacentHTML('beforeend', grids);
 
-const onGrid = () => {
-	console.log(grid);
-	console.log(grid.matches('.vis'));
-	
-	if(grid.matches('.vis')){
-		grid.classList.remove('vis');
-		localStorage.grids = 'off';
-	}else{
-		grid.classList.add('vis')
-		localStorage.grids = 'on';
+	const onGrid = () => {
+		console.log(grid);
+		console.log(grid.matches('.vis'));
 
-	}
-};
+		if (grid.matches('.vis')) {
+			grid.classList.remove('vis');
+			localStorage.grids = 'off';
+		} else {
+			grid.classList.add('vis')
+			localStorage.grids = 'on';
 
-document.querySelector('.gridOn').addEventListener('click', onGrid);
+		}
+	};
+
+	document.querySelector('.gridOn').addEventListener('click', onGrid);
+
 
 if (localStorage.grids === 'on'){
 	grid.classList.add('vis')
 };
-}

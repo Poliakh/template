@@ -212,6 +212,7 @@ const bundle = () => {
 						],
 					  },
 				]
+
 			}
 			// ,plugins: [
 			// 	new CopyPlugin({
@@ -249,9 +250,9 @@ function images() {
 				optimizationLevel: 5 //от 0 до 7
 			})
 		)
+
 		.pipe(gulpif(!flags.prod, dest(path.build.img)))
 		.pipe(gulpif(flags.prod, dest(path.prod.img)))
-
 	return src(path.src.sprite)
 		.pipe(gulpif(!flags.prod, dest(path.build.img)))
 		.pipe(gulpif(flags.prod, dest(path.prod.img)))
