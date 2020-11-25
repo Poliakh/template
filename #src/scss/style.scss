@@ -1,4 +1,4 @@
-
+@import 'reset.css';
 @import '_fonts';
 @import 'container';
 @import '_footer';
@@ -20,6 +20,9 @@ li {
 html,
 body {
 	scroll-behavior: smooth;
+}
+html{
+	font-size: 16px;
 }
 picture{//??
 	width: 100%;

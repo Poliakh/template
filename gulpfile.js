@@ -1,13 +1,15 @@
 /*
- -------------- для запуска версии prodaction-----------------
+ -------------- для запуска версии production-----------------
 	gulp build - обычная сборка в папку  build
 	gulp prod - сжатая версия в папке prodгction
 	gulp - дефолтный запуск с вотчером
 ---------------------end-----------------------------------
 */
-const	project_folder		= "build",
-		production_folder	= "production",
-		source_folder		= "#src";
+// const project_folder = "C:/Open_Server/OSPanel/domains/gorelova",//home
+// const project_folder = "D:/Programs/OpenServer/domains/gorelova",//work
+const project_folder	= "build",
+	production_folder	= "production",
+	source_folder		= "#src";
 // const project_folder = require("path").basename(__dirname) // назовет конечную папку названием проекта.
 
 const path = {
@@ -61,8 +63,6 @@ const { src, dest } = require('gulp'),
 	autoprefixer = require('gulp-autoprefixer'),
 	group_media = require('gulp-group-css-media-queries'),
 	rename = require('gulp-rename'),
-	uglify = require('gulp-uglify-es').default,
-	babel = require('gulp-babel'),
 	imagemin = require('gulp-imagemin'),
 	webp = require('gulp-webp'),
 	webp_html = require('gulp-webp-html'),
@@ -74,22 +74,34 @@ const { src, dest } = require('gulp'),
 	plumber = require('gulp-plumber'),
 	// strip = require('gulp-strip-comments'),//устанвить после создания условий для  prodaction
 	cssnano = require('gulp-cssnano'),
-	gulpif = require('gulp-if');
+	gulpif = require('gulp-if'),
+	webpack = require("webpack-stream"),
+	CopyPlugin = require('copy-webpack-plugin');
+
 
 const flags = {
-	prod:false
+	prod: false
 };
 
 async function flagProd() {
 	flags.prod = true;
 };
 
+const mode = () => {
+	return (flags.prod) ? "production" : "development";
+};
 
 function browserSync() {
 	browsersync.init({
 		server: {
 			baseDir: "./" + project_folder + "/"
 		},
+		ghostMode: {
+			clicks: false,
+			forms: false,
+			scroll: false
+		},
+
 		port: 3000,
 		notify: false
 	});
@@ -161,9 +173,8 @@ const bundle = () => {
 											corejs: 3,
 											useBuiltIns: "usage",
 											targets: [
-												'last 2 versions', 'not dead', '> 0.2%',
+												'last 2 versions', 'not dead', '> 0.2%'
 											]
-
 										}
 									]
 								],
@@ -211,10 +222,8 @@ function images() {
 			})
 		)
 		.pipe(gulpif(flags.prod, dest(path.prod.img), dest(path.build.img)))
-
 	return src(path.src.svg)
-		.pipe(gulpif(!flags.prod, dest(path.build.img)))
-		.pipe(gulpif(flags.prod, dest(path.prod.img)))
+		.pipe(gulpif(flags.prod, dest(path.prod.img), dest(path.build.img)))
 		.pipe(browsersync.stream())
 }
 
@@ -235,7 +244,7 @@ gulp.task('otf2ttf', function () {
 })
 
 gulp.task('svgSprite', function () {
-	return gulp.src([source_folder + '/iconsprite/*.svg'])
+	return gulp.src([source_folder + '/images/*.svg'])
 		.pipe(svgSprite({
 			mode: {
 				stack: {
@@ -262,11 +271,8 @@ function clean_prod() {
 	return del(path.clean_prod);
 };
 function otherProd() {
-	// return src(path.build.fonts +  "/**/*.*")
-	// .pipe(dest(path.prod.fonts))
-	// .pipe(src(path.build.img + "/**/*.*"))
-	// .pipe(dest(path.prod.img));
-
+	// return src(path.build.fonts + "/**/*.*")
+	// 	.pipe(dest(path.prod.fonts))
 }
 
 const build = gulp.series(clean, gulp.parallel(bundle, style, html, images, fonts));
