@@ -7,9 +7,9 @@
 */
 // const project_folder = "C:/Open_Server/OSPanel/domains/gorelova",//home
 // const project_folder = "D:/Programs/OpenServer/domains/gorelova",//work
-const project_folder = "build",
-	production_folder = "production",
-	source_folder = "#src";
+const project_folder	= "build",
+	production_folder	= "production",
+	source_folder		= "#src";
 // const project_folder = require("path").basename(__dirname) // назовет конечную папку названием проекта.
 
 const path = {
@@ -27,7 +27,7 @@ const path = {
 		js: source_folder + "/script/",
 		scss: source_folder + "/scss/style.scss",
 		css: source_folder + "/css/**/*.css",
-		sprite: source_folder + "/images/**/*.svg",
+		svg: source_folder + "/images/**/*.svg",
 		img: source_folder + "/images/**/*.{jpg,png,gif,ico,webp}",
 		fonts: source_folder + "/fonts/**/*.*"//"/fonts/**/*.ttf"
 	},
@@ -109,7 +109,6 @@ function browserSync() {
 
 function html() {
 	return src(path.src.html)
-		.pipe(sourcemaps.init())
 		.pipe(plumber())
 		.pipe(rigger())
 		// .pipe(webp_html())
@@ -119,8 +118,7 @@ function html() {
 				removeComments: true 
 				})
 			))
-		.pipe(gulpif(!flags.prod, sourcemaps.write()))
-		.pipe(gulpif(flags.prod, dest(path.prod.html ), dest(path.build.html )))
+		.pipe(gulpif(flags.prod, dest( path.prod.html ), dest( path.build.html )))
 		.pipe(browsersync.stream())
 }
 
@@ -140,15 +138,13 @@ function style() {
 			})
 		)
 		// .pipe(webpcss())
-		.pipe(gulpif(!flags.prod, sourcemaps.write()))
-		.pipe(gulpif(flags.prod, cssnano()))
 		.pipe(
 			rename({
 				extname: ".min.css"
 			})
 		)
-		.pipe(gulpif(!flags.prod, sourcemaps.write('.')))
-		.pipe(gulpif(flags.prod, dest(path.prod.style ) , dest(path.build.style )))
+		.pipe(gulpif(flags.prod, cssnano(), sourcemaps.write('.')))
+		.pipe(gulpif(flags.prod, dest(path.prod.style ), dest(path.build.style )))
 		.pipe(browsersync.stream())
 }
 
@@ -160,7 +156,7 @@ const bundle = () => {
 				filename: 'main.min.js'
 			},
 			watch: false,
-			devtool: "source-map",
+			devtool: flags.prod? '': 'source-map',
 			module: {
 				rules: [
 					{
@@ -176,7 +172,7 @@ const bundle = () => {
 											corejs: 3,
 											useBuiltIns: "usage",
 											targets: [
-												'last 2 versions', 'not dead', '> 0.2%'
+												'last 2 versions', 'not dead', '> 0.2%',
 											]
 										}
 									]
@@ -187,18 +183,17 @@ const bundle = () => {
 								cacheDirectory: true
 							}
 						}
-					}, {
+					},
+					 {
 						test: /\.s[ac]ss$/i,
 						use: [
-						  // Creates `style` nodes from JS strings
-						  'style-loader',
-						  // Translates CSS into CommonJS
-						  'css-loader',
-						  // Compiles Sass to CSS
-						  'sass-loader',
-						],
-					  },
+							'style-loader',
+							'css-loader',
+							'sass-loader',
+						  ],
+					}
 				]
+
 			}
 			// ,plugins: [
 			// 	new CopyPlugin({
@@ -210,20 +205,13 @@ const bundle = () => {
 			// 	}),
 			// ]
 		}))
-	.pipe(gulpif(flags.prod, dest(path.prod.js ), dest(path.build.js )))
-	.pipe(browsersync.stream())
-		// .on("end", browsersync.reload);
+		.pipe(gulpif(flags.prod, dest(path.prod.js), dest(path.build.js)))
+		.pipe(browsersync.stream())
+	// .on("end", browsersync.reload);
 };
 
 function images() {
 	src(path.src.img)
-		// .pipe(
-		// 	webp({
-		// 		quality: 70
-		// 	})
-		// )
-		// .pipe(dest(path.build.img))
-		// .pipe(src(path.src.img))
 		.pipe(
 			imagemin({
 				progressive: true,
@@ -233,9 +221,9 @@ function images() {
 			})
 		)
 		.pipe(gulpif(flags.prod, dest(path.prod.img), dest(path.build.img)))
- return src(path.src.sprite)
-		.pipe(gulpif(flags.prod, dest(path.prod.img), dest(path.build.img))))
-    .pipe(browsersync.stream())
+	return src(path.src.svg)
+		.pipe(gulpif(flags.prod, dest(path.prod.img), dest(path.build.img)))
+		.pipe(browsersync.stream())
 }
 
 function fonts() {
@@ -288,13 +276,13 @@ function otherProd() {
 
 const build = gulp.series(clean, gulp.parallel(bundle, style, html, images, fonts));
 
-const build_prod = gulp.series(flagProd, clean_prod, gulp.parallel(bundle, style, html, images, fonts), otherProd);
+const build_prod = gulp.series(flagProd, clean_prod, gulp.parallel(bundle, style, html, images, fonts));
 
 const watch = gulp.series(build, gulp.parallel(watchFile, browserSync));
 
 exports.fonts = fonts;
 exports.images = images;
-exports.bundle = bundle;
+exports.scripts = bundle;
 exports.scss = style;
 exports.html = html;
 exports.build = build;
