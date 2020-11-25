@@ -39,6 +39,6 @@
 }
 
 //exemple
-@include font-face('Montserrat Black', "../fonts/Montserrat/Montserrat Black 900", 900, null, woff2 woff);
-@include font-face('Montserrat SemiBold', "../fonts/Montserrat/Montserrat SemiBold 600", 600, bold, woff2 woff);
-@include font-face('Montserrat Regular', "../fonts/Montserrat/Montserrat Regular 400", 400, normal, woff2 woff);
+@include font-face('Montserrat', "../fonts/Montserrat/Montserrat Black 900", 900, black, woff2 woff);
+@include font-face('Montserrat', "../fonts/Montserrat/Montserrat SemiBold 600", 600, bold, woff2 woff);
+@include font-face('Montserrat', "../fonts/Montserrat/Montserrat Regular 400", 400, normal, woff2 woff);
