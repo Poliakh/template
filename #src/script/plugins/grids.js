@@ -1,26 +1,26 @@
 /* for displays the grid on the page  */
 
-export const addGrids = () => {
+export default () => {
 	const grids =
-		`<button class="gridOn"></button>
-<div id="grid" class="wrapGrid">
-	<div class="container">
-		<div class="grid ">
-			<div class="col"></div>
-			<div class="col"></div>
-			<div class="col"></div>
-			<div class="col"></div>
-			<div class="col"></div>
-			<div class="col"></div>
-			<div class="col"></div>
-			<div class="col"></div>
-			<div class="col"></div>
-			<div class="col"></div>
-			<div class="col"></div>
-			<div class="col"></div>
+	`<button class="gridOn"></button>
+	<div id="grid" class="wrapGrid">
+		<div class="container">
+			<div class="grid ">
+				<div class="col"></div>
+				<div class="col"></div>
+				<div class="col"></div>
+				<div class="col"></div>
+				<div class="col"></div>
+				<div class="col"></div>
+				<div class="col"></div>
+				<div class="col"></div>
+				<div class="col"></div>
+				<div class="col"></div>
+				<div class="col"></div>
+				<div class="col"></div>
+			</div>
 		</div>
-	</div>
-</div>`;
+	</div>`;
 
 	document.body.insertAdjacentHTML('beforeend', grids);
 
@@ -40,7 +40,7 @@ export const addGrids = () => {
 
 	document.querySelector('.gridOn').addEventListener('click', onGrid);
 
-	if (localStorage.grids === 'on') {
-		grid.classList.add('vis')
-	};
-}
+
+if (localStorage.grids === 'on'){
+	grid.classList.add('vis')
+};

@@ -1,11 +1,3 @@
-	//= plugins/style-WebP.js
-		/* for displays the grid on the page */
-	//= plugins/grids
-		/* my methods */
-	//= plugins/myMethod
-	//= components/demo
+import gridViewByClick from './plugins/grids'
+gridViewByClick()
 
-console.log("Hello World");
-
-import {addGrids} from './plugins/grids';
-addGrids()
